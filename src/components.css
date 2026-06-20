@@ -51,11 +51,20 @@
 .map-feed video { @apply w-full aspect-video object-cover; }
 
 /* Feed item */
-.feed-item { @apply border border-border rounded-lg overflow-hidden; }
-.feed-header { @apply flex items-center justify-between px-3 py-2 bg-muted border-b border-border; }
+.feed-item { @apply border border-border rounded-lg overflow-hidden flex flex-col; }
+.feed-header { @apply flex items-center justify-between px-3 py-2 bg-muted border-b border-border shrink-0; }
 .feed-title { @apply text-xs font-medium text-foreground truncate; }
+.feed-media { @apply relative; }
 .feed-item img,
 .feed-item video { @apply w-full aspect-video object-cover bg-foreground/5; }
+.feed-error { @apply flex flex-col items-center justify-center aspect-video bg-muted/50 gap-2; }
+.feed-error-text { @apply text-xs text-muted-foreground; }
+.feed-error-retry { @apply text-xs text-primary hover:underline; }
+.feed-stalled-overlay { @apply absolute top-2 left-2 right-2; }
+.feed-stalled { @apply inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100/90 text-amber-700; }
+.feed-footer { @apply flex items-center justify-between px-3 py-1.5 border-t border-border text-xs; }
+.feed-footer-meta { @apply text-muted-foreground truncate; }
+.feed-footer-btn { @apply text-muted-foreground hover:text-foreground transition-colors; }
 
 /* Sidebar */
 .sidebar { @apply w-80 border-l border-border flex flex-col shrink-0 bg-background; }
@@ -83,6 +92,17 @@
 .camera-row { @apply flex items-center gap-2 px-3 py-1.5 pl-8 cursor-pointer hover:bg-muted/50 text-sm text-foreground; }
 .camera-row input[type="checkbox"] { @apply accent-primary; }
 .camera-row-label { @apply truncate; }
+/* Modal */
+.modal-overlay { @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4; }
+.modal { @apply bg-background rounded-lg border border-border shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto; }
+.modal-header { @apply flex items-center justify-between px-4 py-3 border-b border-border; }
+.modal-title { @apply text-sm font-semibold text-foreground; }
+.modal-body { @apply p-4; }
+.modal-media { @apply w-full aspect-video object-cover rounded-md mb-4; }
+.modal-details { @apply grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm; }
+.modal-details dt { @apply text-muted-foreground font-medium; }
+.modal-details dd { @apply text-foreground break-all; }
+.modal-details a { @apply text-primary hover:underline; }
 
 /* Responsive */
 @media (max-width: 768px) {

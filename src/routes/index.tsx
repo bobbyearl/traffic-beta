@@ -11,6 +11,7 @@ type SearchParams = {
   selected?: string
   view?: string
   grid?: string
+  detail?: string
 }
 
 export const Route = createFileRoute('/')({
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/')({
     selected: (search.selected as string) || undefined,
     view: search.view === 'map' ? 'map' : undefined,
     grid: ['sm', 'lg'].includes(search.grid as string) ? (search.grid as string) : undefined,
+    detail: (search.detail as string) || undefined,
   }),
 })
 
@@ -99,6 +101,9 @@ function Home() {
     () => cameras.filter((c) => selectedIds.has(c.id)),
     [cameras, selectedIds],
   )
+
+  const detailCam = useMemo(() => params.detail ? cameras.find((c) => c.id === params.detail) ?? null : null, [cameras, params.detail])
+  const setDetailCam = (cam: Camera | null) => navigate({ search: { ...params, detail: cam?.id || undefined } })
 
   if (isLoading) {
     return <div className="loading">Loading cameras...</div>
@@ -182,7 +187,7 @@ function Home() {
         {/* Viewer area */}
         <div className="viewer-area">
           {view === 'map' ? (
-            <CameraMap cameras={cameras} selectedIds={selectedIds} onToggle={toggleCamera} cardSize={cardSize} />
+            <CameraMap cameras={cameras} selectedIds={selectedIds} onToggle={toggleCamera} cardSize={cardSize} setDetailCam={setDetailCam} />
           ) : selectedCameras.length === 0 ? (
             <div className="empty-state">
               <p className="empty-title">Select cameras to view</p>
@@ -191,7 +196,7 @@ function Home() {
           ) : (
             <div className={`viewer-grid viewer-grid-${cardSize}`}>
               {selectedCameras.map((cam) => (
-                <CameraFeed key={cam.id} camera={cam} mode={mode} onRemove={() => toggleCamera(cam.id)} />
+                <CameraFeed key={cam.id} camera={cam} mode={mode} onRemove={() => toggleCamera(cam.id)} setDetailCam={setDetailCam} />
               ))}
             </div>
           )}
@@ -269,27 +274,138 @@ function Home() {
           )}
         </aside>
       )}
-    </div>
-  )
-}
 
-function CameraFeed({ camera, mode, onRemove }: { camera: Camera; mode: string; onRemove: () => void }) {
-  return (
-    <div className="feed-item">
-      <div className="feed-header">
-        <span className="feed-title">{camera.description}</span>
-        <button className="btn-icon-sm" onClick={onRemove} title="Remove"><X size={12} /></button>
-      </div>
-      {mode === 'video' ? (
-        <video src={camera.video_url} autoPlay muted playsInline controls />
-      ) : (
-        <img src={camera.image_url} alt={camera.description} />
+      {/* Detail modal */}
+      {detailCam && (
+        <div className="modal-overlay" onClick={() => setDetailCam(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">{detailCam.description}</h2>
+              <button className="btn-icon-sm" onClick={() => setDetailCam(null)}><X size={16} /></button>
+            </div>
+            <div className="modal-body">
+              {mode === 'video' ? (
+                <video src={detailCam.video_url} autoPlay muted playsInline controls className="modal-media" />
+              ) : (
+                <img src={detailCam.image_url} alt={detailCam.description} className="modal-media" />
+              )}
+              <dl className="modal-details">
+                <dt>Route</dt><dd>{detailCam.route}</dd>
+                <dt>Direction</dt><dd>{detailCam.direction || 'N/A'}</dd>
+                <dt>Region</dt><dd>{detailCam.jurisdiction}</dd>
+                <dt>Coordinates</dt><dd>{detailCam.lat.toFixed(6)}, {detailCam.lng.toFixed(6)}</dd>
+                <dt>Camera ID</dt><dd>{detailCam.name}</dd>
+                <dt>Image URL</dt><dd><a href={detailCam.image_url} target="_blank" rel="noopener">{detailCam.image_url}</a></dd>
+                <dt>Video URL</dt><dd><a href={detailCam.video_url} target="_blank" rel="noopener">{detailCam.video_url}</a></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
 }
 
-function CameraMap({ cameras, selectedIds, onToggle, cardSize }: { cameras: Camera[]; selectedIds: Set<string>; onToggle: (id: string) => void; cardSize: string }) {
+function CameraFeed({ camera, mode, onRemove, setDetailCam }: { camera: Camera; mode: string; onRemove: () => void; setDetailCam: (c: Camera) => void }) {
+  const [error, setError] = useState(false)
+  const [stalled, setStalled] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [videoKey, setVideoKey] = useState(0)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const checkInterval = useRef<ReturnType<typeof setInterval> | null>(null)
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastTimeRef = useRef(-1)
+
+  useEffect(() => {
+    if (mode !== 'video' || error) return
+    lastTimeRef.current = -1
+    checkInterval.current = setInterval(() => {
+      const video = videoRef.current
+      if (!video) { console.log(`[${camera.id}] no video ref`); return }
+      console.log(`[${camera.id}] check: currentTime=${video.currentTime}, lastTime=${lastTimeRef.current}, networkState=${video.networkState}, readyState=${video.readyState}`)
+      if ((video.currentTime === lastTimeRef.current && video.currentTime > 0) || (video.currentTime === 0 && lastTimeRef.current === -1)) {
+        console.warn(`[${camera.id}] stalled at ${video.currentTime}s, networkState=${video.networkState}, readyState=${video.readyState}, retry=${retryCount}`)
+        setStalled(true)
+        // Auto-retry with exponential backoff (max 3 retries)
+        if (retryCount < 3) {
+          const delay = Math.pow(2, retryCount) * 2000
+          retryTimer.current = setTimeout(() => {
+            setStalled(false)
+            setRetryCount((c) => c + 1)
+            lastTimeRef.current = 0
+            if (videoRef.current) {
+              videoRef.current.load()
+              videoRef.current.play()
+            }
+          }, delay)
+        }
+      } else {
+        if (video.currentTime > 0) {
+          setStalled(false)
+        } else if (lastTimeRef.current === -1) {
+          // First check, video at 0 - give it one more cycle
+          lastTimeRef.current = -1
+        }
+      }
+      lastTimeRef.current = video.currentTime === 0 && lastTimeRef.current === -1 ? -1 : video.currentTime
+    }, 5000)
+    return () => {
+      if (checkInterval.current) clearInterval(checkInterval.current)
+      if (retryTimer.current) clearTimeout(retryTimer.current)
+    }
+  }, [mode, error, retryCount])
+
+  const retry = () => { setError(false); setStalled(false); setRetryCount(0); setVideoKey((k) => k + 1); lastTimeRef.current = -1 }
+
+  const handleError = () => {
+    console.warn(`[${camera.id}] video onError fired, retryCount=${retryCount}`)
+    if (retryCount < 3) {
+      setStalled(true)
+      const delay = Math.pow(2, retryCount) * 2000
+      retryTimer.current = setTimeout(() => {
+        setStalled(false)
+        setRetryCount((c) => c + 1)
+        setVideoKey((k) => k + 1)
+        lastTimeRef.current = -1
+      }, delay)
+    } else {
+      setError(true)
+    }
+  }
+
+  return (
+    <div className="feed-item">
+      <div className="feed-header">
+        <span className="feed-title">{camera.description}</span>
+      </div>
+      <div className="feed-media">
+        {error ? (
+          <div className="feed-error">
+            <p className="feed-error-text">SCDOT feed unavailable</p>
+            <button className="feed-error-retry" onClick={retry}>Retry</button>
+          </div>
+        ) : mode === 'video' ? (
+          <>
+            <video key={videoKey} ref={videoRef} src={camera.video_url} autoPlay muted playsInline controls onError={handleError} />
+            {stalled && (
+              <div className="feed-stalled-overlay">
+                <span className="feed-stalled">unstable feed{retryCount > 0 ? ` (retry ${retryCount}/3)` : ''}</span>
+              </div>
+            )}
+          </>
+        ) : (
+          <img src={camera.image_url} alt={camera.description} onError={() => setError(true)} />
+        )}
+      </div>
+      <div className="feed-footer">
+        <button className="feed-footer-btn" onClick={() => setDetailCam(camera)}>Detail</button>
+        <button className="feed-footer-btn" onClick={onRemove}>Remove</button>
+      </div>
+    </div>
+  )
+}
+
+function CameraMap({ cameras, selectedIds, onToggle, cardSize, setDetailCam }: { cameras: Camera[]; selectedIds: Set<string>; onToggle: (id: string) => void; cardSize: string; setDetailCam: (c: Camera) => void }) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || ''
   const mode = Route.useSearch().mode ?? 'video'
@@ -305,7 +421,7 @@ function CameraMap({ cameras, selectedIds, onToggle, cardSize }: { cameras: Came
 
   return (
     <APIProvider apiKey={apiKey}>
-      <MapInner cameras={cameras} selectedIds={selectedIds} onToggle={onToggle} mode={mode} mapId={mapId} cardSize={cardSize} />
+      <MapInner cameras={cameras} selectedIds={selectedIds} onToggle={onToggle} mode={mode} mapId={mapId} cardSize={cardSize} setDetailCam={setDetailCam} />
     </APIProvider>
   )
 }
@@ -319,7 +435,7 @@ function clampToRect(px: number, py: number, rectX: number, rectY: number, rectW
   }
 }
 
-function MapInner({ cameras, selectedIds, onToggle, mode, mapId, cardSize }: { cameras: Camera[]; selectedIds: Set<string>; onToggle: (id: string) => void; mode: string; mapId: string; cardSize: string }) {
+function MapInner({ cameras, selectedIds, onToggle, mode, mapId, cardSize, setDetailCam }: { cameras: Camera[]; selectedIds: Set<string>; onToggle: (id: string) => void; mode: string; mapId: string; cardSize: string; setDetailCam: (c: Camera) => void }) {
   const map = useMap()
   const [offsets, setOffsets] = useState<Map<string, { x: number; y: number }>>(new Map())
   const [dragging, setDragging] = useState<{ id: string; startX: number; startY: number; ox: number; oy: number } | null>(null)
@@ -334,42 +450,100 @@ function MapInner({ cameras, selectedIds, onToggle, mode, mapId, cardSize }: { c
     prevSelectedRef.current = new Set(selectedIds)
     if (newIds.length <= 1) return
 
-    // Get camera objects for the new IDs
     const newCams = newIds.map((id) => cameras.find((c) => c.id === id)).filter(Boolean) as Camera[]
+    if (!map || newCams.length === 0) return
 
-    // Zoom to fit the new cameras
-    if (map) {
-      const bounds = new google.maps.LatLngBounds()
-      for (const cam of newCams) bounds.extend({ lat: cam.lat, lng: cam.lng })
-      map.fitBounds(bounds, 100)
-    }
+    const cardW = cardWidthPx
+    const cardH = cardWidthPx * 0.75 + 50
 
-    // Sort by geographic angle from centroid to minimize line crossings
-    const centroidLat = newCams.reduce((s, c) => s + c.lat, 0) / newCams.length
-    const centroidLng = newCams.reduce((s, c) => s + c.lng, 0) / newCams.length
-    const sorted = [...newCams].sort((a, b) => {
-      const angleA = Math.atan2(a.lat - centroidLat, a.lng - centroidLng)
-      const angleB = Math.atan2(b.lat - centroidLat, b.lng - centroidLng)
-      return angleA - angleB
-    })
+    // 1. Zoom to fit all markers with padding for cards
+    const bounds = new google.maps.LatLngBounds()
+    for (const cam of newCams) bounds.extend({ lat: cam.lat, lng: cam.lng })
+    map.fitBounds(bounds, { top: cardH + 80, bottom: 80, left: cardW / 2 + 40, right: cardW / 2 + 40 })
 
-    // Polygon layout with sorted order
-    const cardHeight = cardWidthPx * 0.6
-    const n = sorted.length
-    const cardDiagonal = Math.sqrt(cardWidthPx * cardWidthPx + cardHeight * cardHeight)
-    const radius = Math.max(cardWidthPx, (n * cardDiagonal * 0.55) / (2 * Math.PI))
+    // 2. Wait for map to settle, then compute pixel-based layout
+    setTimeout(() => {
+      const projection = map.getProjection()
+      if (!projection) return
 
-    setOffsets((prev) => {
-      const next = new Map(prev)
-      sorted.forEach((cam, i) => {
-        const angle = (2 * Math.PI * i) / n - Math.PI / 2
-        next.set(cam.id, {
-          x: Math.cos(angle) * radius,
-          y: Math.sin(angle) * radius,
-        })
+      const zoom = map.getZoom() ?? 10
+      const scale = Math.pow(2, zoom)
+      const mapBounds = map.getBounds()
+      if (!mapBounds) return
+
+      // Convert lat/lng to pixel position relative to map container
+      const nw = projection.fromLatLngToPoint(mapBounds.getNorthEast())!
+      const sw = projection.fromLatLngToPoint(mapBounds.getSouthWest())!
+      const topLeft = projection.fromLatLngToPoint(new google.maps.LatLng(mapBounds.getNorthEast().lat(), mapBounds.getSouthWest().lng()))!
+
+      const toPixel = (lat: number, lng: number) => {
+        const worldPoint = projection.fromLatLngToPoint(new google.maps.LatLng(lat, lng))!
+        return {
+          x: (worldPoint.x - topLeft.x) * scale,
+          y: (worldPoint.y - topLeft.y) * scale,
+        }
+      }
+
+      // Get pixel positions for each camera
+      const camPixels = newCams.map((cam) => ({ cam, pixel: toPixel(cam.lat, cam.lng) }))
+
+      // Sort by geographic angle from centroid (still helps with line crossings)
+      const centroidX = camPixels.reduce((s, c) => s + c.pixel.x, 0) / camPixels.length
+      const centroidY = camPixels.reduce((s, c) => s + c.pixel.y, 0) / camPixels.length
+      camPixels.sort((a, b) => {
+        const angleA = Math.atan2(a.pixel.y - centroidY, a.pixel.x - centroidX)
+        const angleB = Math.atan2(b.pixel.y - centroidY, b.pixel.x - centroidX)
+        return angleA - angleB
       })
-      return next
-    })
+
+      // Greedy placement: for each camera, try positions in expanding spiral until no overlap
+      // Include all marker positions as obstacles (16x16 each)
+      const placed: Array<{ x: number; y: number; w: number; h: number }> = []
+      for (const { pixel } of camPixels) {
+        placed.push({ x: pixel.x - 8, y: pixel.y - 8, w: 16, h: 16 })
+      }
+
+      const overlaps = (x: number, y: number) => {
+        for (const p of placed) {
+          if (x < p.x + p.w + 8 && x + cardW + 8 > p.x && y < p.y + p.h + 8 && y + cardH + 8 > p.y) return true
+        }
+        return false
+      }
+
+      const newOffsets = new Map<string, { x: number; y: number }>()
+
+      for (const { cam, pixel } of camPixels) {
+        // Try positions in a spiral: increasing distance, multiple angles
+        let bestX = 0, bestY = -(cardH + 20)
+        let found = false
+
+        for (let dist = cardH * 0.6; dist < cardH * 8 && !found; dist += cardH * 0.3) {
+          for (let a = 0; a < 16; a++) {
+            const angle = (Math.PI * 2 * a) / 16 - Math.PI / 2
+            const candidateX = Math.cos(angle) * dist
+            const candidateY = Math.sin(angle) * dist
+            const absX = pixel.x + candidateX
+            const absY = pixel.y + candidateY
+
+            if (!overlaps(absX, absY)) {
+              bestX = candidateX
+              bestY = candidateY
+              found = true
+              break
+            }
+          }
+        }
+
+        placed.push({ x: pixel.x + bestX, y: pixel.y + bestY, w: cardW, h: cardH })
+        newOffsets.set(cam.id, { x: bestX, y: bestY })
+      }
+
+      setOffsets((prev) => {
+        const next = new Map(prev)
+        for (const [id, offset] of newOffsets) next.set(id, offset)
+        return next
+      })
+    }, 500) // Wait for fitBounds to settle
   }, [selectedIds, map, cameras, cardWidthPx])
 
   const onPointerDown = (e: React.PointerEvent, id: string) => {
@@ -426,14 +600,18 @@ function MapInner({ cameras, selectedIds, onToggle, mode, mapId, cardSize }: { c
             {isSelected ? (
               <div className="map-feed-anchor" onClick={(e) => e.stopPropagation()}>
                 <div className="map-pin-active" />
-                {offset && (offset.x !== 0 || offset.y !== 0) && (
-                  <svg style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none' }}>
-                    <line x1="8" y1="8" x2={clampToRect(8, 8, offset.x, offset.y, cardWidthPx, cardWidthPx * 0.6).x} y2={clampToRect(8, 8, offset.x, offset.y, cardWidthPx, cardWidthPx * 0.6).y} stroke="var(--color-accent-marker)" strokeWidth="2" strokeDasharray="4 3" />
-                  </svg>
-                )}
+                {(() => {
+                  const ex = offset?.x ?? cardWidthPx * 0.15
+                  const ey = offset?.y ?? -(cardWidthPx * 0.7 + 20)
+                  return (
+                    <svg style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none' }}>
+                      <line x1="8" y1="8" x2={clampToRect(8, 8, ex, ey, cardWidthPx, cardWidthPx * 0.6).x} y2={clampToRect(8, 8, ex, ey, cardWidthPx, cardWidthPx * 0.6).y} stroke="var(--color-accent-marker)" strokeWidth="2" strokeDasharray="4 3" />
+                    </svg>
+                  )
+                })()}
                 <div
                   className="map-feed"
-                  style={{ width: `${cardWidthPx}px`, position: 'absolute', left: offset?.x ?? 0, top: offset?.y ?? -cardWidthPx * 0.4 }}
+                  style={{ width: `${cardWidthPx}px`, position: 'absolute', left: offset?.x ?? cardWidthPx * 0.15, top: offset?.y ?? -(cardWidthPx * 0.7 + 20) }}
                   onPointerMove={onPointerMove}
                   onPointerUp={onPointerUp}
                 >
@@ -454,6 +632,10 @@ function MapInner({ cameras, selectedIds, onToggle, mode, mapId, cardSize }: { c
                   ) : (
                     <img src={cam.image_url} alt={cam.description} />
                   )}
+                  <div className="feed-footer">
+                    <button className="feed-footer-btn" onClick={(e) => { e.stopPropagation(); setDetailCam(cam) }}>Detail</button>
+                    <button className="feed-footer-btn" onClick={(e) => { e.stopPropagation(); onToggle(cam.id) }}>Remove</button>
+                  </div>
                 </div>
               </div>
             ) : (
