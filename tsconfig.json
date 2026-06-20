@@ -15,6 +15,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+    "types": ["google.maps"],
     "resolveJsonModule": true
   },
   "include": ["src"]
