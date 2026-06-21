@@ -11,9 +11,10 @@ import { CameraCard } from './CameraCard';
 
 interface CameraMapProps {
   stateId: string;
+  markersOnly?: boolean;
 }
 
-export function CameraMap({ stateId }: CameraMapProps) {
+export function CameraMap({ stateId, markersOnly }: CameraMapProps) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || '';
 
@@ -28,7 +29,7 @@ export function CameraMap({ stateId }: CameraMapProps) {
 
   return (
     <APIProvider apiKey={apiKey}>
-      <MapInner mapId={mapId} stateId={stateId} />
+      <MapInner mapId={mapId} stateId={stateId} markersOnly={markersOnly} />
     </APIProvider>
   );
 }
@@ -40,8 +41,8 @@ function clampToRect(px: number, py: number, rectX: number, rectY: number, rectW
   };
 }
 
-function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
-  const { cameras, selectedIds, toggleCamera, mode, cardSize, setDetailCam, layoutKey } = useTraffic();
+function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: string; markersOnly?: boolean }) {
+  const { cameras, selectedIds, selectedCameras, toggleCamera, mode, cardSize, setDetailCam, layoutKey } = useTraffic();
   const { resolvedTheme } = useTheme();
   const map = useMap();
   const [offsets, setOffsets] = useState<Map<string, { x: number; y: number }>>(new Map());
@@ -88,7 +89,13 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
       for (const cam of newCams) {
         bounds.extend({ lat: cam.lat, lng: cam.lng });
       }
-      map.fitBounds(bounds, { top: cardH + 80, bottom: 80, left: cardW / 2 + 40, right: cardW / 2 + 40 });
+      const padding = markersOnly ? 40 : { top: cardH + 80, bottom: 80, left: cardW / 2 + 40, right: cardW / 2 + 40 };
+      map.fitBounds(bounds, padding);
+    }
+
+    // Skip layout computation in markersOnly mode (no card overlays to position)
+    if (markersOnly) {
+      return;
     }
 
     const runLayout = () => {
@@ -216,6 +223,23 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
     }
   };
 
+  const [visibleBounds, setVisibleBounds] = useState<{ n: number; s: number; e: number; w: number } | null>(null);
+
+  const handleCameraChange = () => {
+    if (!map) { return; }
+    const b = map.getBounds();
+    if (b) {
+      setVisibleBounds({ n: b.getNorthEast().lat(), s: b.getSouthWest().lat(), e: b.getNorthEast().lng(), w: b.getSouthWest().lng() });
+    }
+  };
+
+  const visibleCameras = visibleBounds
+    ? cameras.filter((cam) => selectedIds.has(cam.id) || (cam.lat <= visibleBounds.n && cam.lat >= visibleBounds.s && cam.lng <= visibleBounds.e && cam.lng >= visibleBounds.w))
+    : cameras.filter((cam) => selectedIds.has(cam.id));
+
+  // Map camera id -> 1-based selection index (matches order in split panel)
+  const selectionIndex = new Map(selectedCameras.map((cam, i) => [cam.id, i + 1]));
+
   return (
     <GoogleMap
       defaultCenter={getStateConfig(stateId).defaultCenter}
@@ -223,8 +247,9 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
       mapId={mapId}
       colorScheme={resolvedTheme === 'dark' ? 'DARK' : 'LIGHT'}
       className="map-container"
+      onCameraChanged={handleCameraChange}
     >
-      {cameras.map((cam) => {
+      {visibleCameras.map((cam) => {
         const isSelected = selectedIds.has(cam.id);
         const offset = offsets.get(cam.id);
         return (
@@ -234,9 +259,11 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
             onClick={() => handleMarkerClick(cam.id)}
             zIndex={isSelected ? 100 : 1}
           >
-            {isSelected ? (
+            {isSelected && !markersOnly ? (
               <div className="map-feed-anchor" onClick={(e) => e.stopPropagation()}>
-                <div className="map-pin-active" />
+                <div className="map-pin-active">
+                  <span className="map-pin-number">{selectionIndex.get(cam.id)}</span>
+                </div>
                 {(() => {
                   const ex = offset?.x ?? cardWidthPx * 0.15,
                     ey = offset?.y ?? -(cardWidthPx * 0.7 + 20);
@@ -245,8 +272,8 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
                       <line
                         x1="8"
                         y1="8"
-                        x2={clampToRect(8, 8, ex, ey, cardWidthPx, cardWidthPx * 0.6).x}
-                        y2={clampToRect(8, 8, ex, ey, cardWidthPx, cardWidthPx * 0.6).y}
+                        x2={ex + 2}
+                        y2={ey + 2}
                         stroke="var(--color-accent-marker)"
                         strokeWidth="2"
                         strokeDasharray="4 3"
@@ -269,6 +296,7 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
                     camera={cam}
                     onRemove={() => toggleCamera(cam.id)}
                     onDetail={() => setDetailCam(cam)}
+                    index={selectionIndex.get(cam.id)}
                     headerLeft={<div className="map-feed-drag" onPointerDown={(e) => onPointerDown(e, cam.id)}><GripVertical size={12} /></div>}
                   >
                     {mode === 'video' ? (
@@ -280,7 +308,9 @@ function MapInner({ mapId, stateId }: { mapId: string; stateId: string }) {
                 </div>
               </div>
             ) : (
-              <div className={`map-pin ${!getStateConfig(stateId).supportsVideo ? 'map-pin-image' : ''}`} />
+              <div className={`map-pin ${isSelected ? 'map-pin-selected' : ''} ${!getStateConfig(stateId).supportsVideo ? 'map-pin-image' : ''}`}>
+                {selectionIndex.get(cam.id) && <span className="map-pin-number">{selectionIndex.get(cam.id)}</span>}
+              </div>
             )}
           </AdvancedMarker>
         );

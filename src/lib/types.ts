@@ -6,6 +6,7 @@ export type ViewSearchParams = {
   grid: string | undefined;
   detail: string | undefined;
   tab: string | undefined;
+  sw: string | undefined;
 };
 
 export const emptyViewSearch: ViewSearchParams = {
@@ -16,4 +17,5 @@ export const emptyViewSearch: ViewSearchParams = {
   grid: undefined,
   detail: undefined,
   tab: undefined,
+  sw: undefined,
 };

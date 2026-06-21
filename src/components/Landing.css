@@ -5,7 +5,7 @@
 }
 
 .hero {
-  @apply relative flex flex-col items-center justify-center text-center px-4 py-32 bg-cover bg-center;
+  @apply relative flex flex-col items-center justify-center text-center px-4 py-24 bg-cover bg-center;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('/roadie/hero.jpg');
 }
 .hero-content {
@@ -18,13 +18,17 @@
   @apply text-lg text-white/80 max-w-xl mb-8 mx-auto;
 }
 .hero-actions {
-  @apply flex gap-3 justify-center;
+  @apply flex gap-5 justify-center mb-5;
 }
 .hero-cta {
-  @apply px-6 py-3 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary-hover transition-colors;
+  @apply inline-flex items-center gap-2 px-6 py-3 text-white font-medium rounded-lg transition-colors;
+  background-color: var(--color-accent-marker);
+}
+.hero-cta:hover {
+  filter: brightness(1.1);
 }
 .hero-cta-secondary {
-  @apply px-6 py-3 bg-white/10 text-white font-medium rounded-lg border border-white/30 hover:bg-white/20 transition-colors;
+  @apply px-6 py-3 border-2 border-white/80 text-white font-medium rounded-lg hover:bg-white hover:text-gray-900 transition-colors;
 }
 .hero-credit {
   @apply absolute bottom-2 right-3 text-[10px] text-white/40;
@@ -34,10 +38,10 @@
 }
 
 .features {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-8 py-16 max-w-5xl mx-auto;
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-4 py-4 sm:gap-6 sm:px-8 sm:py-12 max-w-4xl mx-auto;
 }
 .feature {
-  @apply flex flex-col items-center text-center gap-2;
+  @apply flex flex-row items-start text-left gap-3 sm:flex-col sm:items-center sm:text-center sm:gap-2;
 }
 .feature h3 {
   @apply text-sm font-semibold text-foreground;
@@ -46,17 +50,17 @@
   @apply text-xs text-muted-foreground;
 }
 .feature svg {
-  @apply text-primary;
+  @apply text-primary shrink-0 mt-0.5 sm:mt-0;
 }
 
 .states {
-  @apply px-8 py-12 max-w-3xl mx-auto w-full;
+  @apply px-4 py-8 sm:px-8 sm:py-12 max-w-4xl mx-auto w-full;
 }
 .states h2 {
   @apply text-lg font-semibold text-foreground mb-4 text-center;
 }
 .state-grid {
-  @apply grid grid-cols-2 sm:grid-cols-4 gap-3;
+  @apply grid grid-cols-2 md:grid-cols-4 gap-3;
 }
 .state-card {
   @apply flex flex-col items-center gap-1 p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors;
@@ -70,9 +74,37 @@
 .state-card-badge {
   @apply text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700;
 }
+.state-card-badges {
+  @apply flex gap-1 flex-wrap justify-center;
+}
 .state-card-badge-routes {
   @apply bg-blue-100 text-blue-700;
 }
 .state-card-badge-muted {
   @apply bg-muted text-muted-foreground;
+}
+.hero-badge {
+  @apply text-[10px] px-1.5 py-0.5 rounded-full border border-white/30 text-white/70 ml-1 uppercase tracking-wide font-normal;
+}
+
+.credits {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto px-4 py-8 sm:gap-6 sm:px-8 sm:py-12;
+}
+.credits-card {
+  @apply bg-muted/50 border border-border rounded-lg p-6;
+}
+.credits-card h3 {
+  @apply text-lg font-semibold text-foreground mb-3;
+}
+.credits-card p {
+  @apply text-sm text-muted-foreground mb-3 last:mb-0;
+}
+.credits-card ul {
+  @apply space-y-2 text-sm text-muted-foreground;
+}
+.credits-card a {
+  @apply text-primary hover:underline;
+}
+.credits-btn {
+  @apply inline-block mt-2 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted transition-colors no-underline text-foreground;
 }

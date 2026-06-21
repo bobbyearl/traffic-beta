@@ -11,7 +11,14 @@
   border: none !important;
 }
 .map-pin {
-  @apply w-3 h-3 bg-primary/60 rounded-full border-2 border-white shadow cursor-pointer;
+  @apply w-3 h-3 bg-primary/60 rounded-full border-2 border-white shadow cursor-pointer relative;
+}
+.map-pin-selected {
+  @apply w-5 h-5;
+  background-color: var(--color-accent-marker);
+}
+.map-pin-number {
+  @apply absolute inset-0 flex items-center justify-center text-white font-bold text-[9px] leading-none;
 }
 .map-pin-image {
   @apply bg-muted-foreground/50;
@@ -21,11 +28,11 @@
   @apply relative;
 }
 .map-pin-active {
-  @apply w-4 h-4 rounded-full border-2 border-white shadow-lg;
+  @apply w-5 h-5 rounded-full border-2 border-white shadow-lg relative flex items-center justify-center;
   background-color: var(--color-accent-marker);
 }
 .map-feed {
-  @apply bg-background rounded-lg overflow-hidden shadow-lg border-2;
+  @apply bg-background rounded-lg shadow-lg border-2 relative;
   border-color: var(--color-accent-marker);
 }
 .map-feed-drag {

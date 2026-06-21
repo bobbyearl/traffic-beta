@@ -3,6 +3,11 @@
 .sidebar {
   @apply w-80 border-l border-border flex flex-col shrink-0 bg-background;
 }
+@media (max-width: 768px) {
+  .sidebar {
+    @apply fixed inset-y-0 right-0 z-50 w-[85vw] max-w-80 shadow-xl;
+  }
+}
 .sidebar-tabs {
   @apply flex border-b border-border shrink-0;
 }
