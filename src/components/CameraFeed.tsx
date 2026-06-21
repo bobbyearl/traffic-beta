@@ -1,74 +1,92 @@
-import { useEffect, useRef, useState } from 'react'
-import { type Camera } from '../lib/cameras'
-import { X } from 'lucide-react'
-import './CameraFeed.css'
+import './CameraFeed.css';
+
+import { useEffect, useRef, useState } from 'react';
+
+import { type Camera } from '../lib/cameras';
 
 interface CameraFeedProps {
-  camera: Camera
-  mode: string
-  onRemove: () => void
-  setDetailCam: (c: Camera) => void
+  camera: Camera;
+  mode: string;
+  onRemove: () => void;
+  setDetailCam: (c: Camera) => void;
 }
 
 export function CameraFeed({ camera, mode, onRemove, setDetailCam }: CameraFeedProps) {
-  const [error, setError] = useState(false)
-  const [stalled, setStalled] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
-  const [videoKey, setVideoKey] = useState(0)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const checkInterval = useRef<ReturnType<typeof setInterval> | null>(null)
-  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastTimeRef = useRef(-1)
+  const [error, setError] = useState(false);
+  const [stalled, setStalled] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [videoKey, setVideoKey] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const checkInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTimeRef = useRef(-1);
 
   useEffect(() => {
-    if (mode !== 'video' || error) return
-    lastTimeRef.current = -1
+    if (mode !== 'video' || error) {
+      return;
+    }
+    lastTimeRef.current = -1;
     checkInterval.current = setInterval(() => {
-      const video = videoRef.current
-      if (!video) return
-      if ((video.currentTime === lastTimeRef.current && video.currentTime > 0) || (video.currentTime === 0 && lastTimeRef.current === -1)) {
-        setStalled(true)
+      const video = videoRef.current;
+      if (!video) {
+        return;
+      }
+      if (
+        (video.currentTime === lastTimeRef.current && video.currentTime > 0) ||
+        (video.currentTime === 0 && lastTimeRef.current === -1)
+      ) {
+        setStalled(true);
         if (retryCount < 3) {
-          const delay = Math.pow(2, retryCount) * 2000
+          const delay = Math.pow(2, retryCount) * 2000;
           retryTimer.current = setTimeout(() => {
-            setStalled(false)
-            setRetryCount((c) => c + 1)
-            lastTimeRef.current = 0
+            setStalled(false);
+            setRetryCount((c) => c + 1);
+            lastTimeRef.current = 0;
             if (videoRef.current) {
-              videoRef.current.load()
-              videoRef.current.play()
+              videoRef.current.load();
+              videoRef.current.play();
             }
-          }, delay)
+          }, delay);
         }
       } else {
         if (video.currentTime > 0) {
-          setStalled(false)
+          setStalled(false);
         }
       }
-      lastTimeRef.current = video.currentTime === 0 && lastTimeRef.current === -1 ? -1 : video.currentTime
-    }, 5000)
+      lastTimeRef.current = video.currentTime === 0 && lastTimeRef.current === -1 ? -1 : video.currentTime;
+    }, 5000);
     return () => {
-      if (checkInterval.current) clearInterval(checkInterval.current)
-      if (retryTimer.current) clearTimeout(retryTimer.current)
-    }
-  }, [mode, error, retryCount])
+      if (checkInterval.current) {
+        clearInterval(checkInterval.current);
+      }
+      if (retryTimer.current) {
+        clearTimeout(retryTimer.current);
+      }
+    };
+  }, [mode, error, retryCount]);
 
-  const retry = () => { setError(false); setStalled(false); setRetryCount(0); setVideoKey((k) => k + 1); lastTimeRef.current = -1 }
+  const retry = () => {
+    setError(false);
+    setStalled(false);
+    setRetryCount(0);
+    setVideoKey((k) => k + 1);
+    lastTimeRef.current = -1;
+  };
 
   const handleError = () => {
     if (retryCount < 3) {
-      setStalled(true)
-      const delay = Math.pow(2, retryCount) * 2000
+      setStalled(true);
+      const delay = Math.pow(2, retryCount) * 2000;
       retryTimer.current = setTimeout(() => {
-        setStalled(false)
-        setRetryCount((c) => c + 1)
-        setVideoKey((k) => k + 1)
-        lastTimeRef.current = -1
-      }, delay)
+        setStalled(false);
+        setRetryCount((c) => c + 1);
+        setVideoKey((k) => k + 1);
+        lastTimeRef.current = -1;
+      }, delay);
     } else {
-      setError(true)
+      setError(true);
     }
-  }
+  };
 
   return (
     <div className="feed-item">
@@ -79,11 +97,22 @@ export function CameraFeed({ camera, mode, onRemove, setDetailCam }: CameraFeedP
         {error ? (
           <div className="feed-error">
             <p className="feed-error-text">Feed unavailable</p>
-            <button className="feed-error-retry" onClick={retry}>Retry</button>
+            <button className="feed-error-retry" onClick={retry}>
+              Retry
+            </button>
           </div>
         ) : mode === 'video' ? (
           <>
-            <video key={videoKey} ref={videoRef} src={camera.video_url} autoPlay muted playsInline controls onError={handleError} />
+            <video
+              key={videoKey}
+              ref={videoRef}
+              src={camera.video_url}
+              autoPlay
+              muted
+              playsInline
+              controls
+              onError={handleError}
+            />
             {stalled && (
               <div className="feed-stalled-overlay">
                 <span className="feed-stalled">unstable feed{retryCount > 0 ? ` (retry ${retryCount}/3)` : ''}</span>
@@ -95,9 +124,13 @@ export function CameraFeed({ camera, mode, onRemove, setDetailCam }: CameraFeedP
         )}
       </div>
       <div className="feed-footer">
-        <button className="feed-footer-btn" onClick={() => setDetailCam(camera)}>Detail</button>
-        <button className="feed-footer-btn" onClick={onRemove}>Remove</button>
+        <button className="feed-footer-btn" onClick={() => setDetailCam(camera)}>
+          Detail
+        </button>
+        <button className="feed-footer-btn" onClick={onRemove}>
+          Remove
+        </button>
       </div>
     </div>
-  )
+  );
 }
