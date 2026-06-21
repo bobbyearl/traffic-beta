@@ -1,11 +1,27 @@
 @reference "../styles.css";
 
-.feed-item { @apply border border-border rounded-lg overflow-hidden flex flex-col; }
-.feed-media { @apply relative; }
+.feed-item {
+  @apply border border-border rounded-lg flex flex-col relative;
+}
+.feed-media {
+  @apply relative overflow-hidden;
+}
 .feed-item img,
-.feed-item video { @apply w-full aspect-video object-cover bg-foreground/5; }
-.feed-error { @apply flex flex-col items-center justify-center aspect-video bg-muted/50 gap-2; }
-.feed-error-text { @apply text-xs text-muted-foreground; }
-.feed-error-retry { @apply text-xs text-primary hover:underline; }
-.feed-stalled-overlay { @apply absolute top-2 left-2 right-2; }
-.feed-stalled { @apply inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100/90 text-amber-700; }
+.feed-item video {
+  @apply w-full aspect-video object-cover bg-foreground/5;
+}
+.feed-error {
+  @apply flex flex-col items-center justify-center aspect-video bg-muted/50 gap-2;
+}
+.feed-error-text {
+  @apply text-xs text-muted-foreground;
+}
+.feed-error-retry {
+  @apply text-xs text-primary hover:underline;
+}
+.feed-stalled-overlay {
+  @apply absolute top-2 left-2 right-2;
+}
+.feed-stalled {
+  @apply inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100/90 text-amber-700;
+}

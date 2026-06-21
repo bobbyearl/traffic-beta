@@ -66,14 +66,14 @@ function parseNormalized(data: unknown): Camera[] {
 
 export const STATES: StateConfig[] = [
   {
-    id: 'sc',
-    name: 'South Carolina',
-    dataFile: 'data/cameras.geojson',
-    parser: parseSC,
-    defaultCenter: { lat: 33.8, lng: -80.9 },
+    id: 'ga',
+    name: 'Georgia',
+    dataFile: 'data/ga.json',
+    parser: parseNormalized,
+    defaultCenter: { lat: 33.7, lng: -84.4 },
     defaultZoom: 8,
-    supportsVideo: true,
-    cameraCount: 760,
+    supportsVideo: false,
+    cameraCount: 4043,
   },
   {
     id: 'nc',
@@ -86,6 +86,16 @@ export const STATES: StateConfig[] = [
     cameraCount: 1112,
   },
   {
+    id: 'sc',
+    name: 'South Carolina',
+    dataFile: 'data/cameras.geojson',
+    parser: parseSC,
+    defaultCenter: { lat: 33.8, lng: -80.9 },
+    defaultZoom: 8,
+    supportsVideo: true,
+    cameraCount: 760,
+  },
+  {
     id: 'va',
     name: 'Virginia',
     dataFile: 'data/va.geojson',
@@ -95,18 +105,22 @@ export const STATES: StateConfig[] = [
     supportsVideo: true,
     cameraCount: 1692,
   },
-  {
-    id: 'ga',
-    name: 'Georgia',
-    dataFile: 'data/ga.json',
-    parser: parseNormalized,
-    defaultCenter: { lat: 33.7, lng: -84.4 },
-    defaultZoom: 8,
-    supportsVideo: false,
-    cameraCount: 4043,
-  },
 ];
 
+export const ALL_STATES_CONFIG: StateConfig = {
+  id: 'all',
+  name: 'All States',
+  dataFile: '',
+  parser: () => [],
+  defaultCenter: { lat: 35.0, lng: -80.0 },
+  defaultZoom: 6,
+  supportsVideo: false,
+  cameraCount: STATES.reduce((sum, s) => sum + s.cameraCount, 0),
+};
+
 export function getStateConfig(stateId: string): StateConfig {
+  if (stateId === 'all') {
+    return ALL_STATES_CONFIG;
+  }
   return STATES.find((s) => s.id === stateId) ?? STATES[0];
 }

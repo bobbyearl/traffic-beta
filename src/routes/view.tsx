@@ -11,6 +11,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
+import { SplitView } from '../components/SplitView';
 import { TrafficProvider, useTraffic } from '../lib/TrafficContext';
 import { type ViewSearchParams } from '../lib/types';
 
@@ -26,16 +27,17 @@ export const Route = createFileRoute('/view')({
     state: (search.state as string) || undefined,
     mode: search.mode === 'image' ? 'image' : undefined,
     selected: (search.selected as string) || undefined,
-    view: search.view === 'map' ? 'map' : undefined,
+    view: ['map', 'split'].includes(search.view as string) ? (search.view as string) : undefined,
     grid: ['sm', 'lg'].includes(search.grid as string) ? (search.grid as string) : undefined,
     detail: (search.detail as string) || undefined,
     tab: search.tab === 'regions' ? 'regions' : undefined,
+    sw: search.sw ? String(search.sw) : undefined,
   }),
 });
 
 function Home() {
   const { isLoading, stateId, selectedCameras, mode, view, cardSize, toggleCamera, setDetailCam } = useTraffic();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
 
   if (isLoading) {
     return <div className="loading">Loading cameras...</div>;
@@ -46,9 +48,11 @@ function Home() {
       <div className="main">
         <Header sidebarOpen={sidebarOpen} onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} />
 
-        <div className="viewer-area">
+        <div className={`viewer-area ${view === 'split' ? 'viewer-area-split' : ''}`}>
           {view === 'map' ? (
             <CameraMap key={stateId} stateId={stateId} />
+          ) : view === 'split' ? (
+            <SplitView stateId={stateId} />
           ) : selectedCameras.length === 0 ? (
             <div className="empty-state">
               <p className="empty-title">Select cameras to view</p>
@@ -71,7 +75,12 @@ function Home() {
         <Footer />
       </div>
 
-      {sidebarOpen && <Sidebar />}
+      {sidebarOpen && (
+        <>
+          <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+          <Sidebar />
+        </>
+      )}
       <DetailModal />
     </div>
   );

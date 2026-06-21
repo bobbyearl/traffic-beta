@@ -10,9 +10,10 @@ interface CameraFeedProps {
   mode: string;
   onRemove: () => void;
   setDetailCam: (c: Camera) => void;
+  index?: number;
 }
 
-export function CameraFeed({ camera, mode, onRemove, setDetailCam }: CameraFeedProps) {
+export function CameraFeed({ camera, mode, onRemove, setDetailCam, index }: CameraFeedProps) {
   const [error, setError] = useState(false);
   const [stalled, setStalled] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -89,20 +90,29 @@ export function CameraFeed({ camera, mode, onRemove, setDetailCam }: CameraFeedP
     }
   };
 
-
-
   return (
     <div className="feed-item">
-      <CameraCard camera={camera} onRemove={onRemove} onDetail={() => setDetailCam(camera)}>
+      <CameraCard camera={camera} onRemove={onRemove} onDetail={() => setDetailCam(camera)} index={index}>
         <div className="feed-media">
           {error ? (
             <div className="feed-error">
               <p className="feed-error-text">Feed unavailable</p>
-              <button className="feed-error-retry" onClick={retry}>Retry</button>
+              <button className="feed-error-retry" onClick={retry}>
+                Retry
+              </button>
             </div>
           ) : mode === 'video' ? (
             <>
-              <video key={videoKey} ref={videoRef} src={camera.video_url} autoPlay muted playsInline controls onError={handleError} />
+              <video
+                key={videoKey}
+                ref={videoRef}
+                src={camera.video_url}
+                autoPlay
+                muted
+                playsInline
+                controls
+                onError={handleError}
+              />
               {stalled && (
                 <div className="feed-stalled-overlay">
                   <span className="feed-stalled">unstable feed{retryCount > 0 ? ` (retry ${retryCount}/3)` : ''}</span>

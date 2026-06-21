@@ -13,7 +13,11 @@
   @apply flex items-center gap-4;
 }
 .site-footer-links a {
+  color: var(--color-accent-marker);
   @apply hover:text-foreground transition-colors;
+}
+.site-footer-divider {
+  @apply text-border;
 }
 
 .theme-switcher {
@@ -24,4 +28,13 @@
 }
 .theme-btn-active {
   @apply bg-muted text-foreground;
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    @apply gap-2 px-2;
+  }
+  .site-footer-links {
+    @apply gap-2;
+  }
 }

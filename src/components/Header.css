@@ -1,7 +1,7 @@
 @reference "../styles.css";
 
 .header-bar {
-  @apply grid grid-cols-[auto_1fr_auto] items-center px-4 py-2 border-b border-border shrink-0;
+  @apply grid grid-cols-[1fr_auto] items-center px-4 py-2 border-b border-border shrink-0;
 }
 .header-bar-left {
   @apply flex items-center gap-3;
@@ -26,10 +26,13 @@
 }
 
 .btn-icon {
-  @apply flex items-center justify-center w-8 h-8 border border-border rounded-md text-muted-foreground hover:bg-muted transition-colors;
+  @apply flex items-center justify-center w-8 h-8 border border-border rounded-md text-muted-foreground hover:bg-muted transition-colors cursor-pointer;
+}
+.btn-icon:disabled {
+  @apply opacity-30 pointer-events-none;
 }
 .btn-icon.btn-active {
-  @apply bg-primary text-primary-foreground border-primary;
+  color: var(--color-accent-marker);
 }
 .btn-icon-sm {
   @apply flex items-center justify-center w-5 h-5 rounded text-muted-foreground hover:text-foreground;
@@ -45,4 +48,25 @@
 }
 .btn-group .btn-icon:last-child {
   @apply rounded-r-md border-r;
+}
+
+@media (max-width: 768px) {
+  .header-bar {
+    @apply grid-cols-[1fr] gap-1 py-1.5;
+  }
+  .header-bar-left {
+    @apply justify-between w-full;
+  }
+  .header-bar-count {
+    @apply text-xs;
+  }
+  .header-bar-actions {
+    @apply w-full justify-center;
+  }
+  .header-bar-divider {
+    @apply hidden;
+  }
+  .hidden-mobile {
+    @apply hidden;
+  }
 }

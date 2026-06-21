@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react';
 
-import { type Camera, getStateConfig, type StateConfig } from '../lib/cameras';
+import { type Camera, getStateConfig, type StateConfig,STATES } from '../lib/cameras';
 import { CURATED_ROUTES } from '../lib/routes';
 import { type ViewSearchParams } from '../lib/types';
 
@@ -23,6 +23,7 @@ interface TrafficState {
   view: string;
   cardSize: string;
   sidebarTab: string;
+  splitWidth: number;
 
   // Actions
   toggleCamera: (id: string) => void;
@@ -33,6 +34,7 @@ interface TrafficState {
   setMode: (mode: string | undefined) => void;
   setGrid: (grid: string | undefined) => void;
   setTab: (tab: string | undefined) => void;
+  setSplitWidth: (percent: number) => void;
   setState: (state: string) => void;
   triggerLayout: () => void;
   layoutKey: number;
@@ -58,6 +60,16 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
   const { data: cameras = [], isLoading } = useQuery({
     queryKey: ['cameras', stateId],
     queryFn: async () => {
+      if (stateId === 'all') {
+        const results = await Promise.all(
+          STATES.map(async (s) => {
+            const res = await fetch(import.meta.env.BASE_URL + s.dataFile);
+            const data = await res.json();
+            return s.parser(data).map((cam) => ({ ...cam, id: `${s.id}:${cam.id}` }));
+          }),
+        );
+        return results.flat();
+      }
       const res = await fetch(import.meta.env.BASE_URL + stateConfig.dataFile);
       const data = await res.json();
       return stateConfig.parser(data);
@@ -69,9 +81,14 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
   const view = params.view ?? 'feeds';
   const cardSize = params.grid ?? 'md';
   const sidebarTab = params.tab ?? 'routes';
+  const splitWidth = params.sw ? Math.min(85, Math.max(30, Number(params.sw))) : 70;
 
-  const selectedIds = useMemo(() => new Set(params.selected?.split(',').filter(Boolean) ?? []), [params.selected]);
-  const selectedCameras = useMemo(() => cameras.filter((c) => selectedIds.has(c.id)), [cameras, selectedIds]);
+  const selectedIdList = useMemo(() => params.selected?.split(',').filter(Boolean) ?? [], [params.selected]);
+  const selectedIds = useMemo(() => new Set(selectedIdList), [selectedIdList]);
+  const selectedCameras = useMemo(() => {
+    const camMap = new Map(cameras.map((c) => [c.id, c]));
+    return selectedIdList.map((id) => camMap.get(id)).filter(Boolean) as Camera[];
+  }, [cameras, selectedIdList]);
   const detailCam = useMemo(
     () => (params.detail ? (cameras.find((c) => c.id === params.detail) ?? null) : null),
     [cameras, params.detail],
@@ -101,6 +118,10 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
   const setMode = (m: string | undefined) => navigate({ search: { ...params, mode: m } as ViewSearchParams });
   const setGrid = (g: string | undefined) => navigate({ search: { ...params, grid: g } as ViewSearchParams });
   const setTab = (tab: string | undefined) => navigate({ search: { ...params, tab } as ViewSearchParams });
+  const setSplitWidth = (percent: number) => {
+    const rounded = Math.round(percent);
+    navigate({ search: { ...params, sw: rounded === 70 ? undefined : String(rounded) } as ViewSearchParams });
+  };
   const setState = (s: string) =>
     navigate({
       search: {
@@ -109,6 +130,7 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
         mode: params.mode,
         grid: params.grid,
         tab: params.tab,
+        sw: params.sw,
         selected: undefined,
         detail: undefined,
       } as ViewSearchParams,
@@ -130,6 +152,7 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
     view,
     cardSize,
     sidebarTab,
+    splitWidth,
     layoutKey,
     toggleCamera,
     clearAll,
@@ -139,6 +162,7 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
     setMode,
     setGrid,
     setTab,
+    setSplitWidth,
     setState,
     triggerLayout,
   };

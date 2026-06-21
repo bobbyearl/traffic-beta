@@ -4,7 +4,6 @@ import { Link } from '@tanstack/react-router';
 import { Monitor, Moon, Sun } from 'lucide-react';
 
 import { useTheme } from '../lib/ThemeContext';
-import { emptyViewSearch } from '../lib/types';
 
 export function Footer() {
   const { theme, setTheme } = useTheme();
@@ -12,12 +11,6 @@ export function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer-left">
-        <span className="site-footer-brand">
-          Roadie by{' '}
-          <a href="https://www.bobbyearl.com" target="_blank">
-            Bobby Earl
-          </a>
-        </span>
         <div className="theme-switcher">
           <button
             className={`theme-btn ${theme === 'system' ? 'theme-btn-active' : ''}`}
@@ -43,15 +36,15 @@ export function Footer() {
         </div>
       </div>
       <nav className="site-footer-links">
-        <Link to="/">Home</Link>
-        <Link to="/view" search={emptyViewSearch}>
-          View Cameras
-        </Link>
+        <span className="site-footer-brand">
+          <Link to="/">Roadie</Link> by{' '}
+          <a href="https://www.bobbyearl.com" target="_blank" rel="noopener">
+            Bobby Earl
+          </a>
+        </span>
+        <span className="site-footer-divider">|</span>
         <a href="https://github.com/bobbyearl/roadie/issues/new?labels=bug" target="_blank" rel="noopener">
-          Report a Problem
-        </a>
-        <a href="https://github.com/bobbyearl/roadie" target="_blank" rel="noopener">
-          GitHub
+          Become a Backseat Driver
         </a>
       </nav>
     </footer>
