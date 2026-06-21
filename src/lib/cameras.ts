@@ -1,48 +1,48 @@
 export interface Camera {
-  id: string
-  name: string
-  description: string
-  route: string
-  direction: string
-  jurisdiction: string
-  lat: number
-  lng: number
-  image_url: string
-  video_url: string
-  active: boolean
+  id: string;
+  name: string;
+  description: string;
+  route: string;
+  direction: string;
+  jurisdiction: string;
+  lat: number;
+  lng: number;
+  image_url: string;
+  video_url: string;
+  active: boolean;
 }
 
 export interface StateConfig {
-  id: string
-  name: string
-  dataFile: string
-  parser: (data: unknown) => Camera[]
-  defaultCenter: { lat: number; lng: number }
-  defaultZoom: number
-  supportsVideo: boolean
-  cameraCount: number
+  id: string;
+  name: string;
+  dataFile: string;
+  parser: (data: unknown) => Camera[];
+  defaultCenter: { lat: number; lng: number };
+  defaultZoom: number;
+  supportsVideo: boolean;
+  cameraCount: number;
 }
 
 export interface CameraGeoJSON {
   features: Array<{
-    type: 'Feature'
-    geometry: { coordinates: [number, number]; type: 'Point' }
+    type: 'Feature';
+    geometry: { coordinates: [number, number]; type: 'Point' };
     properties: {
-      id: string
-      name: string
-      description: string
-      route: string
-      direction: string
-      jurisdiction: string
-      image_url: string
-      https_url: string
-      active: boolean
-    }
-  }>
+      id: string;
+      name: string;
+      description: string;
+      route: string;
+      direction: string;
+      jurisdiction: string;
+      image_url: string;
+      https_url: string;
+      active: boolean;
+    };
+  }>;
 }
 
 function parseSC(data: unknown): Camera[] {
-  const geojson = data as CameraGeoJSON
+  const geojson = data as CameraGeoJSON;
   return geojson.features
     .filter((f) => f.properties.active)
     .map((f) => ({
@@ -57,11 +57,11 @@ function parseSC(data: unknown): Camera[] {
       image_url: f.properties.image_url,
       video_url: f.properties.https_url,
       active: f.properties.active,
-    }))
+    }));
 }
 
 function parseNormalized(data: unknown): Camera[] {
-  return (data as Camera[]).filter((c) => c.active)
+  return (data as Camera[]).filter((c) => c.active);
 }
 
 export const STATES: StateConfig[] = [
@@ -105,8 +105,8 @@ export const STATES: StateConfig[] = [
     supportsVideo: false,
     cameraCount: 4043,
   },
-]
+];
 
 export function getStateConfig(stateId: string): StateConfig {
-  return STATES.find((s) => s.id === stateId) ?? STATES[0]
+  return STATES.find((s) => s.id === stateId) ?? STATES[0];
 }

@@ -1,7 +1,7 @@
 export interface CuratedRoute {
-  name: string
-  description: string
-  ids: string[]
+  name: string;
+  description: string;
+  ids: string[];
 }
 
 export const CURATED_ROUTES: CuratedRoute[] = [
@@ -99,17 +99,7 @@ export const CURATED_ROUTES: CuratedRoute[] = [
   {
     name: '26 Outer',
     description: 'Cameras on I-26 outer corridor.',
-    ids: [
-      '6322',
-      '4260',
-      '2637',
-      '2638',
-      '2639',
-      '4141',
-      '4139',
-      '4137',
-      '34fede02-7175-11e7-a128-0123456789ab',
-    ],
+    ids: ['6322', '4260', '2637', '2638', '2639', '4141', '4139', '4137', '34fede02-7175-11e7-a128-0123456789ab'],
   },
   {
     name: 'Ravenel Bridge',
@@ -128,28 +118,11 @@ export const CURATED_ROUTES: CuratedRoute[] = [
   {
     name: 'Bridges',
     description: 'Coastal bridge cameras (Wappoo, Ashley River, etc).',
-    ids: [
-      '4145',
-      '6009',
-      '6078',
-      '6091',
-      '6095',
-    ],
+    ids: ['4145', '6009', '6078', '6091', '6095'],
   },
   {
     name: 'Beaches',
     description: 'Cameras at IOP, Sullivans, and Folly.',
-    ids: [
-      '4122',
-      '4125',
-      '4144',
-      '4110',
-      '4111',
-      '4113',
-      '4115',
-      '4117',
-      '6411',
-      '2739',
-    ],
+    ids: ['4122', '4125', '4144', '4110', '4111', '4113', '4115', '4117', '6411', '2739'],
   },
-]
+];

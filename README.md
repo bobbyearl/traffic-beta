@@ -1,73 +1,68 @@
-# React + TypeScript + Vite
+# Roadie
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Multi-state traffic camera viewer. View 7,600+ live cameras across South Carolina, North Carolina, Virginia, and Georgia.
 
-Currently, two official plugins are available:
+**Live:** [bobbyearl.com/roadie](https://bobbyearl.com/roadie)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Multi-camera viewing (select and watch multiple feeds side by side)
+- Interactive map with draggable camera feeds
+- Curated routes for Charleston, SC commuters
+- Multi-state support (SC, NC, VA, GA)
+- Live video (SC, VA) and static images (NC, GA)
+- Dark mode with system preference detection
+- All state saved in the URL (shareable, bookmarkable)
+- Auto-retry on unstable feeds with exponential backoff
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+- React 19, TypeScript, Vite
+- TanStack Router (file-based, URL state)
+- TanStack Query (async data loading)
+- Google Maps (Advanced Markers, draggable feeds, auto-layout)
+- Tailwind CSS v4 with co-located component styles
+- shadcn/ui patterns (no library, just the approach)
+- GitHub Pages via Actions
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Development
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev        # http://localhost:5173/roadie/
+npm run build      # Production build
+npm run lint       # ESLint
+npm run format     # Prettier
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_GOOGLE_MAPS_API_KEY=your-key
+VITE_GOOGLE_MAPS_MAP_ID=your-map-id
+```
+
+## Data Sources
+
+Camera data is stored locally (no runtime API calls to DOT sites):
+
+| State | Source | Cameras | Video |
+|-------|--------|---------|-------|
+| SC | sc.cdn.iteris-atis.com | 760 | Live HLS |
+| NC | drivenc.gov | 1,112 | Images only |
+| VA | 511.vdot.virginia.gov | 1,692 | Live HLS |
+| GA | 511ga.org | 4,043 | Images only |
+
+## History
+
+Previously "Bobby Earl Traffic" (2016-2024), an Angular/SKY UX app for SC-only cameras. Rebuilt in 2026 as Roadie with multi-state support and modern stack.
+
+### Legacy Changelog
+
+- **2019-06-23** - Switched to vertical nav, map location in URL state
+- **2018-09-10** - Website reborn (SKY UX)
+- **2017-09-09** - Revamped with SKY UX Builder
+- **2017-04-01** - Better mobile video player
+- **2016-12-19** - Removed Hurricane Matthew info
