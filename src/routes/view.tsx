@@ -3,18 +3,15 @@ import './view.css';
 
 import { createFileRoute } from '@tanstack/react-router';
 
-
 import { CameraFeed } from '../components/CameraFeed';
-import { CameraMap } from '../components/CameraMap';
 import { DetailModal } from '../components/DetailModal';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { SplitView } from '../components/SplitView';
-import { type Camera } from '../lib/cameras';
-import { TrafficProvider, useTraffic } from '../lib/TrafficContext';
 import { CURATED_ROUTES } from '../lib/routes';
+import { TrafficProvider, useTraffic } from '../lib/TrafficContext';
 import { type ViewSearchParams } from '../lib/types';
 
 export const Route = createFileRoute('/view')({
@@ -40,7 +37,7 @@ export const Route = createFileRoute('/view')({
   }),
 });
 
-export function EmptyState({ cameras, stateId, selectRoute, onBrowse, onSwitchToMap, showMap }: { cameras?: Camera[]; stateId: string; selectRoute: (ids: string[]) => void; onBrowse: () => void; onSwitchToMap: () => void; showMap?: boolean }) {
+export function EmptyState({ stateId, selectRoute, onBrowse, onSwitchToMap, showMap }: { stateId: string; selectRoute: (ids: string[]) => void; onBrowse: () => void; onSwitchToMap: () => void; showMap?: boolean }) {
   const hasCuratedRoutes = stateId === 'sc';
 
   return (
@@ -73,7 +70,7 @@ export function EmptyState({ cameras, stateId, selectRoute, onBrowse, onSwitchTo
 }
 
 function Home() {
-  const { isLoading, stateId, cameras, selectedCameras, stateConfig, mode, showMap, showList, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, toggleMap, setDetailCam } = useTraffic();
+  const { isLoading, stateId, selectedCameras, mode, showMap, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, toggleMap, setDetailCam } = useTraffic();
 
   if (isLoading) {
     return <div className="loading">Loading cameras...</div>;
@@ -88,7 +85,7 @@ function Home() {
             {showMap ? (
               <SplitView stateId={stateId} onBrowse={() => setSidebarOpen(true)} />
             ) : selectedCameras.length === 0 ? (
-              <EmptyState cameras={cameras} stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} onSwitchToMap={toggleMap} showMap={showMap} />
+              <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} onSwitchToMap={toggleMap} showMap={showMap} />
             ) : (
                 <div className={`viewer-grid viewer-grid-${cardSize}`}>
                   {selectedCameras.map((cam) => (
@@ -108,7 +105,7 @@ function Home() {
         {sidebarOpen && (
           <>
             <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
-            <Sidebar onClose={() => setSidebarOpen(false)} />
+            <Sidebar />
           </>
         )}
       </div>

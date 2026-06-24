@@ -34,12 +34,6 @@ export function CameraMap({ stateId, markersOnly }: CameraMapProps) {
   );
 }
 
-function clampToRect(px: number, py: number, rectX: number, rectY: number, rectW: number, rectH: number) {
-  return {
-    x: Math.max(rectX, Math.min(px, rectX + rectW)),
-    y: Math.max(rectY, Math.min(py, rectY + rectH)),
-  };
-}
 
 function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: string; markersOnly?: boolean }) {
   const { cameras, selectedIds, selectedCameras, toggleCamera, mode, cardSize, setDetailCam, layoutKey } = useTraffic();

@@ -17,7 +17,7 @@ export function useVideoPlayer(mode: string) {
     lastTimeRef.current = -1;
     checkInterval.current = setInterval(() => {
       const video = videoRef.current;
-      if (!video) return;
+      if (!video) {return;}
       if (
         (video.currentTime === lastTimeRef.current && video.currentTime > 0) ||
         (video.currentTime === 0 && lastTimeRef.current === -1)
@@ -36,13 +36,13 @@ export function useVideoPlayer(mode: string) {
           }, delay);
         }
       } else {
-        if (video.currentTime > 0) setStalled(false);
+        if (video.currentTime > 0) {setStalled(false);}
       }
       lastTimeRef.current = video.currentTime === 0 && lastTimeRef.current === -1 ? -1 : video.currentTime;
     }, 5000);
     return () => {
-      if (checkInterval.current) clearInterval(checkInterval.current);
-      if (retryTimer.current) clearTimeout(retryTimer.current);
+      if (checkInterval.current) {clearInterval(checkInterval.current);}
+      if (retryTimer.current) {clearTimeout(retryTimer.current);}
     };
   }, [mode, error, retryCount]);
 

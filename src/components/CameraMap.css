@@ -12,18 +12,18 @@
 }
 .map-pin {
   @apply w-2.5 h-2.5 rounded-full cursor-pointer;
-  background-color: var(--color-pin, #E8CB35);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.6);
+  background-color: var(--color-pin);
+  box-shadow: 0 0 0 1px color-mix(in srgb, white 60%, transparent);
 }
 .dark .map-pin {
-  background-color: var(--color-pin-dark, #E8CB35);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+  background-color: var(--color-pin-dark);
+  box-shadow: 0 0 0 1px color-mix(in srgb, black 30%, transparent);
 }
 .map-pin-image {
-  background-color: var(--color-pin, #E8CB35);
+  background-color: var(--color-pin);
 }
 .dark .map-pin-image {
-  background-color: var(--color-pin-dark, #E8CB35);
+  background-color: var(--color-pin-dark);
 }
 .map-pin-selected {
   @apply w-5 h-5 rounded-full relative flex items-center justify-center border-2 border-white shadow;

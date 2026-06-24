@@ -3,9 +3,9 @@ import './SplitView.css';
 import { useCallback, useRef } from 'react';
 
 import { useTraffic } from '../lib/TrafficContext';
+import { EmptyState } from '../routes/view';
 import { CameraFeed } from './CameraFeed';
 import { CameraMap } from './CameraMap';
-import { EmptyState } from '../routes/view';
 
 interface SplitViewProps {
   stateId: string;
@@ -13,13 +13,13 @@ interface SplitViewProps {
 }
 
 export function SplitView({ stateId, onBrowse }: SplitViewProps) {
-  const { cameras, selectedCameras, showList, mode, cardSize, splitWidth, setSplitWidth, toggleCamera, selectRoute, setDetailCam } = useTraffic();
+  const { selectedCameras, showList, mode, cardSize, splitWidth, setSplitWidth, toggleCamera, selectRoute, setDetailCam } = useTraffic();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapPanelRef = useRef<HTMLDivElement>(null);
   const localPercent = useRef(splitWidth);
   const dragging = useRef(false);
 
-  const startDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  const startDrag = useCallback(() => {
     dragging.current = true;
     const isMobile = window.innerWidth < 768;
     document.body.style.cursor = isMobile ? 'row-resize' : 'col-resize';
