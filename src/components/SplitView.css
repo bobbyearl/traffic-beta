@@ -5,6 +5,7 @@
 .split-handle {
   @apply bg-border/50 cursor-col-resize shrink-0 flex items-center justify-center;
   width: 0.375rem;
+  touch-action: none;
 }
 .split-handle-grip {
   @apply rounded-full bg-muted-foreground/40 hover:bg-muted-foreground/70 transition-colors;
