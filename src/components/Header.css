@@ -1,13 +1,17 @@
 @reference "../styles.css";
 
 .header-bar {
-  @apply border-b border-border shrink-0 bg-muted/30 relative;
+  @apply border-b shrink-0 bg-muted relative;
+  border-color: #d1d5db;
+}
+.dark .header-bar {
+  border-color: #4b5563;
 }
 .header-nav {
-  @apply flex items-center justify-between px-4 py-1.5;
+  @apply flex items-center justify-between px-4 py-2;
 }
 .header-nav-right {
-  @apply flex items-center gap-2;
+  @apply flex items-center gap-1;
 }
 .header-bar-title {
   @apply text-base font-semibold text-foreground;
@@ -15,20 +19,24 @@
 .header-bar-title a {
   @apply text-foreground no-underline;
 }
-.header-toolbar {
-  @apply flex items-center justify-between px-4 py-1.5;
-}
-.header-toolbar-left {
-  @apply flex items-center gap-2;
-}
-.header-toolbar-right {
-  @apply flex items-center gap-2;
-}
-.header-bar-count {
-  @apply text-xs text-muted-foreground tabular-nums;
-}
 .state-select {
-  @apply h-7 px-2 text-xs border border-border rounded-md bg-background;
+  @apply h-7 px-2 text-xs border border-border rounded-md bg-background text-foreground;
+  color-scheme: light dark;
+}
+
+.header-tab {
+  @apply absolute left-2 z-30 flex items-center gap-3 px-4 pt-0 pb-1.5 bg-muted border border-t-0 rounded-b-md text-xs;
+  border-color: #d1d5db;
+  color: #6b7280;
+}
+.dark .header-tab {
+  border-color: #4b5563;
+  color: rgb(148 163 184 / 0.6);
+  top: 100%;
+}
+.header-tab-count { @apply tabular-nums; }
+.header-tab-clear {
+  @apply text-muted-foreground hover:text-foreground cursor-pointer disabled:opacity-30 disabled:pointer-events-none;
 }
 
 .btn-icon {
@@ -98,10 +106,7 @@
 
 @media (max-width: 768px) {
   .header-nav {
-    @apply px-3 py-1;
-  }
-  .header-toolbar {
-    @apply px-3 py-1;
+    @apply flex-wrap gap-1.5 px-3 py-2;
   }
   .hidden-mobile {
     @apply hidden;

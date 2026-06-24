@@ -233,6 +233,13 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
     }
   };
 
+  // Trigger initial bounds when map becomes ready
+  useEffect(() => {
+    if (map) {
+      const listener = map.addListener('idle', () => { handleCameraChange(); listener.remove(); });
+    }
+  }, [map]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const visibleCameras = visibleBounds
     ? cameras.filter((cam) => selectedIds.has(cam.id) || (cam.lat <= visibleBounds.n && cam.lat >= visibleBounds.s && cam.lng <= visibleBounds.e && cam.lng >= visibleBounds.w))
     : cameras.filter((cam) => selectedIds.has(cam.id));

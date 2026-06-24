@@ -75,26 +75,22 @@ export function Header({ sidebarOpen, onSidebarToggle }: HeaderProps) {
           ))}
         </select>
         <div className="header-nav-right">
+          {showMap && !showList && (
+            <button className="btn-label" onClick={triggerLayout} disabled={selectedCameras.length < 2}><Sparkles size={14} /> Layout</button>
+          )}
           <button className="btn-label" onClick={handleShare} title="Share"><Share2 size={14} /> Share</button>
           <button className={`btn-label ${prefsOpen ? 'btn-active' : ''}`} onClick={openPrefs} title="View Options">
             <Settings size={14} /> View Options
             {!hasSeenPrefs && <span className="prefs-dot" />}
           </button>
-        </div>
-      </div>
-      <div className="header-toolbar">
-        <div className="header-toolbar-left">
-          <span className="header-bar-count"><span className="hidden-mobile">Viewing </span>{selectedCameras.length}/{cameras.length}</span>
-          <button className="btn-label" onClick={clearAll} disabled={selectedCameras.length === 0}><Trash2 size={14} /> Clear</button>
-        </div>
-        <div className="header-toolbar-right">
-          {showMap && !showList && (
-            <button className="btn-label" onClick={triggerLayout} disabled={selectedCameras.length < 2}><Sparkles size={14} /> Layout</button>
-          )}
           <button className={`btn-label ${sidebarOpen ? 'btn-active' : ''}`} onClick={onSidebarToggle}>
             {sidebarOpen ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />} Browse
           </button>
         </div>
+      </div>
+      <div className="header-tab">
+        <span className="header-tab-count">{selectedCameras.length}/{cameras.length}</span>
+        <button className="header-tab-clear" onClick={clearAll} disabled={selectedCameras.length === 0}><Trash2 size={12} /></button>
       </div>
 
       {prefsOpen && (

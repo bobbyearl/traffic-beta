@@ -75,7 +75,7 @@ export function SplitView({ stateId, onBrowse }: SplitViewProps) {
           </div>
           <div className="split-feeds-panel">
         {selectedCameras.length === 0 ? (
-          <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={onBrowse} onSwitchToMap={() => {}} />
+          <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={onBrowse} onSwitchToMap={() => {}} showMap />
         ) : (
             <div className={`split-feeds-grid ${gridClass}`}>
               {selectedCameras.map((cam, index) => (

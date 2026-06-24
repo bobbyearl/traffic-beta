@@ -39,7 +39,7 @@ export const Route = createFileRoute('/view')({
   }),
 });
 
-export function EmptyState({ cameras, stateId, selectRoute, onBrowse, onSwitchToMap }: { cameras?: Camera[]; stateId: string; selectRoute: (ids: string[]) => void; onBrowse: () => void; onSwitchToMap: () => void }) {
+export function EmptyState({ cameras, stateId, selectRoute, onBrowse, onSwitchToMap, showMap }: { cameras?: Camera[]; stateId: string; selectRoute: (ids: string[]) => void; onBrowse: () => void; onSwitchToMap: () => void; showMap?: boolean }) {
   const hasCuratedRoutes = stateId === 'sc';
 
   return (
@@ -59,8 +59,9 @@ export function EmptyState({ cameras, stateId, selectRoute, onBrowse, onSwitchTo
       <div className="empty-actions">
         <div className="quick-routes">
           <button className="quick-route-btn" onClick={onBrowse}>Browse Cameras</button>
-          <button className="quick-route-btn" onClick={onSwitchToMap}>Use Map</button>
+          {!showMap && <button className="quick-route-btn" onClick={onSwitchToMap}>Use Map</button>}
         </div>
+        {showMap && <p className="empty-hint">or select markers on the map</p>}
         <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a>
       </div>
       {!localStorage.getItem('roadie-prefs-seen') && (
@@ -86,7 +87,7 @@ function Home() {
             {showMap ? (
               <SplitView stateId={stateId} onBrowse={() => setSidebarOpen(true)} />
             ) : selectedCameras.length === 0 ? (
-              <EmptyState cameras={cameras} stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} onSwitchToMap={toggleMap} />
+              <EmptyState cameras={cameras} stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} onSwitchToMap={toggleMap} showMap={showMap} />
             ) : (
                 <div className={`viewer-grid viewer-grid-${cardSize}`}>
                   {selectedCameras.map((cam) => (
