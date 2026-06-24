@@ -4,7 +4,6 @@ import { Settings } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import { useTraffic } from '../lib/TrafficContext';
-import { IconButton } from './IconButton';
 
 export function PrefsButton() {
   const { mode, showMap, showList, cardSize, density, stateConfig, setMode, setGrid, setDensity, setViewMode, resetAll } = useTraffic();
@@ -14,7 +13,13 @@ export function PrefsButton() {
 
   const { refs, floatingStyles, context } = useFloating({
     open,
-    onOpenChange: setOpen,
+    onOpenChange: (nextOpen) => {
+      setOpen(nextOpen);
+      if (nextOpen && !hasSeenPrefs) {
+        localStorage.setItem('roadie-prefs-seen', '1');
+        setHasSeenPrefs(true);
+      }
+    },
     placement: 'bottom',
     middleware: [offset(8), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
     whileElementsMounted: autoUpdate,
@@ -24,22 +29,14 @@ export function PrefsButton() {
   const dismiss = useDismiss(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss]);
 
-  const handleOpen = () => {
-    if (!hasSeenPrefs) {
-      localStorage.setItem('roadie-prefs-seen', '1');
-      setHasSeenPrefs(true);
-    }
-  };
-
   const viewMode = showMap && showList ? 'both' : showMap ? 'map' : 'list';
 
   return (
     <>
-      <div ref={refs.setReference} {...getReferenceProps()} onClick={handleOpen}>
-        <IconButton icon={Settings} label="View Options" active={open} title="View Options">
-          {!hasSeenPrefs && <span className="prefs-dot" />}
-        </IconButton>
-      </div>
+      <button className={`btn-label ${open ? 'btn-active' : ''}`} ref={refs.setReference} {...getReferenceProps()} title="View Options">
+        <Settings size={14} /> View Options
+        {!hasSeenPrefs && <span className="prefs-dot" />}
+      </button>
       {open && (
         <FloatingPortal>
           <div className="prefs-popover" ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
