@@ -95,6 +95,7 @@ function Home() {
                       mode={mode}
                       onRemove={() => toggleCamera(cam.id)}
                       setDetailCam={setDetailCam}
+                      refreshInterval={mode === 'image' ? 30 : 0}
                     />
                   ))}
                 </div>

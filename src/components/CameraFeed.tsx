@@ -1,5 +1,7 @@
 import './CameraFeed.css';
 
+import { useEffect, useState } from 'react';
+
 import { type Camera } from '../lib/cameras';
 import { useVideoPlayer } from '../lib/useVideoPlayer';
 import { CameraCard } from './CameraCard';
@@ -10,10 +12,20 @@ interface CameraFeedProps {
   onRemove: () => void;
   setDetailCam: (c: Camera) => void;
   index?: number;
+  refreshInterval?: number;
 }
 
-export function CameraFeed({ camera, mode, onRemove, setDetailCam, index }: CameraFeedProps) {
+export function CameraFeed({ camera, mode, onRemove, setDetailCam, index, refreshInterval = 0 }: CameraFeedProps) {
   const { videoRef, videoKey, error, stalled, retryCount, retry, handleError, setError } = useVideoPlayer(mode);
+  const [imgTs, setImgTs] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (mode !== 'image' || !refreshInterval) { return; }
+    const id = setInterval(() => setImgTs(Date.now()), refreshInterval * 1000);
+    return () => clearInterval(id);
+  }, [mode, refreshInterval]);
+
+  const imgSrc = refreshInterval ? `${camera.image_url}${camera.image_url.includes('?') ? '&' : '?'}t=${imgTs}` : camera.image_url;
 
   return (
     <div className="feed-item">
@@ -43,7 +55,7 @@ export function CameraFeed({ camera, mode, onRemove, setDetailCam, index }: Came
               )}
             </>
           ) : (
-            <img src={camera.image_url} alt={camera.description} onError={() => setError(true)} />
+            <img src={imgSrc} alt={camera.description} onError={() => setError(true)} />
           )}
         </div>
       </CameraCard>

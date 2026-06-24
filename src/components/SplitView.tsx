@@ -79,7 +79,7 @@ export function SplitView({ stateId, onBrowse }: SplitViewProps) {
         ) : (
             <div className={`split-feeds-grid ${gridClass}`}>
               {selectedCameras.map((cam, index) => (
-                <CameraFeed key={cam.id} camera={cam} mode={mode} onRemove={() => toggleCamera(cam.id)} setDetailCam={setDetailCam} index={index + 1} />
+                <CameraFeed key={cam.id} camera={cam} mode={mode} onRemove={() => toggleCamera(cam.id)} setDetailCam={setDetailCam} index={index + 1} refreshInterval={mode === 'image' ? 30 : 0} />
               ))}
             </div>
         )}
