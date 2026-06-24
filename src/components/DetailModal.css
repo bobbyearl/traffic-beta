@@ -2,26 +2,26 @@
 
 .modal-overlay {
   @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
-  padding: var(--space-lg);
+  padding: var(--rd-space-lg);
 }
 .modal {
   @apply bg-background rounded-lg border border-border shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto;
 }
 .modal-header {
   @apply flex items-center justify-between border-b border-border;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--rd-space-md) var(--rd-space-lg);
 }
 .modal-title {
   @apply font-semibold text-foreground;
-  font-size: var(--text-sm);
+  font-size: var(--rd-text-sm);
 }
 .modal-body {
-  padding: var(--space-lg);
+  padding: var(--rd-space-lg);
 }
 .modal-details {
   @apply grid grid-cols-[auto_1fr];
-  gap: var(--space-sm) var(--space-lg);
-  font-size: var(--text-sm);
+  gap: var(--rd-space-sm) var(--rd-space-lg);
+  font-size: var(--rd-text-sm);
 }
 .modal-details dt {
   @apply text-muted-foreground font-medium;

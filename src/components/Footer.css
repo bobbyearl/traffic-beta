@@ -2,16 +2,16 @@
 
 .site-footer {
   @apply flex items-center justify-between border-t border-border text-muted-foreground shrink-0;
-  padding: var(--space-sm) var(--space-lg);
-  font-size: var(--text-xs);
+  padding: var(--rd-space-sm) var(--rd-space-lg);
+  font-size: var(--rd-text-xs);
 }
 .site-footer-left {
   @apply flex items-center;
-  gap: var(--space-md);
+  gap: var(--rd-space-md);
 }
 .site-footer-links {
   @apply flex items-center;
-  gap: var(--space-sm);
+  gap: var(--rd-space-sm);
 }
 .site-footer-links a {
   @apply text-primary hover:underline;
@@ -22,11 +22,11 @@
 
 @media (max-width: 768px) {
   .site-footer {
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-sm);
+    gap: var(--rd-space-sm);
+    padding: var(--rd-space-sm) var(--rd-space-sm);
   }
   .site-footer-links {
-    gap: var(--space-sm);
+    gap: var(--rd-space-sm);
     font-size: 0.625rem;
   }
 }

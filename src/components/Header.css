@@ -6,15 +6,15 @@
 }
 .header-nav {
   @apply flex items-center justify-between;
-  padding: var(--space-lg) var(--space-lg);
+  padding: var(--rd-space-lg) var(--rd-space-lg);
 }
 .header-nav-right {
   @apply flex items-center;
-  gap: var(--space-xs);
+  gap: var(--rd-space-xs);
 }
 .header-bar-title {
   @apply font-semibold text-foreground;
-  font-size: var(--text-base);
+  font-size: var(--rd-text-base);
 }
 .header-bar-title a {
   @apply text-foreground no-underline;
@@ -22,18 +22,18 @@
 .state-select {
   @apply border border-border rounded-md bg-background text-foreground;
   height: 1.75rem;
-  padding: 0 var(--space-sm);
-  font-size: var(--text-xs);
+  padding: 0 var(--rd-space-sm);
+  font-size: var(--rd-text-xs);
   color-scheme: light dark;
 }
 
 .header-tab {
   @apply absolute left-2 z-30 flex items-center bg-muted border border-t-0 rounded-b-md;
-  gap: var(--space-md);
-  padding: 0 var(--space-lg) var(--space-sm) var(--space-lg);
+  gap: var(--rd-space-md);
+  padding: 0 var(--rd-space-lg) var(--rd-space-sm) var(--rd-space-lg);
   border-color: var(--color-border-strong);
   color: var(--color-subtle);
-  font-size: var(--text-xs);
+  font-size: var(--rd-text-xs);
   top: 100%;
 }
 .header-tab-count { @apply tabular-nums; }
@@ -49,10 +49,10 @@
 }
 .btn-label {
   @apply flex items-center border border-border rounded-md text-muted-foreground hover:bg-muted transition-colors cursor-pointer relative;
-  gap: var(--space-sm);
-  padding: 0 var(--space-sm);
+  gap: var(--rd-space-sm);
+  padding: 0 var(--rd-space-sm);
   height: 2rem;
-  font-size: var(--text-xs);
+  font-size: var(--rd-text-xs);
 }
 .btn-icon:disabled, .btn-label:disabled {
   @apply opacity-30 pointer-events-none;
@@ -79,9 +79,9 @@
 }
 .prefs-popover {
   @apply absolute z-50 bg-background border border-border rounded-lg shadow-lg;
-  right: var(--space-lg);
+  right: var(--rd-space-lg);
   top: 2.5rem;
-  padding: var(--space-lg);
+  padding: var(--rd-space-lg);
   width: 24rem;
 }
 .prefs-popover::before {
@@ -90,21 +90,21 @@
 }
 .prefs-row {
   @apply flex items-center justify-between border-b border-border;
-  gap: var(--space-lg);
-  padding: var(--space-sm) 0;
+  gap: var(--rd-space-lg);
+  padding: var(--rd-space-sm) 0;
 }
 .prefs-label {
   @apply font-medium text-foreground shrink-0;
-  font-size: var(--text-xs);
+  font-size: var(--rd-text-xs);
 }
 .prefs-options {
   @apply flex items-center flex-wrap;
-  gap: var(--space-md);
+  gap: var(--rd-space-md);
 }
 .prefs-options label {
   @apply flex items-center cursor-pointer whitespace-nowrap;
-  gap: var(--space-xs);
-  font-size: var(--text-xs);
+  gap: var(--rd-space-xs);
+  font-size: var(--rd-text-xs);
   color: var(--color-muted-foreground);
 }
 .prefs-options input[type="radio"] {
@@ -112,15 +112,15 @@
 }
 .prefs-footer {
   @apply flex items-center justify-between;
-  padding-top: var(--space-md);
+  padding-top: var(--rd-space-md);
 }
 .prefs-reset {
   @apply text-red-500 hover:text-red-700 cursor-pointer;
-  font-size: var(--text-xs);
+  font-size: var(--rd-text-xs);
 }
 .prefs-close {
   @apply hover:text-foreground cursor-pointer;
-  font-size: var(--text-xs);
+  font-size: var(--rd-text-xs);
   color: var(--color-muted-foreground);
 }
 .prefs-dot {
@@ -131,8 +131,8 @@
 @media (max-width: 768px) {
   .header-nav {
     @apply flex-wrap;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
+    gap: var(--rd-space-sm);
+    padding: var(--rd-space-sm) var(--rd-space-md);
   }
   .hidden-mobile {
     @apply hidden;
@@ -151,7 +151,7 @@
   }
   .prefs-popover {
     @apply w-auto;
-    right: var(--space-sm);
-    left: var(--space-sm);
+    right: var(--rd-space-sm);
+    left: var(--rd-space-sm);
   }
 }

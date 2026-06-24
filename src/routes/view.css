@@ -5,29 +5,29 @@
 .main { @apply flex-1 flex flex-col min-w-0; }
 .loading { @apply flex items-center justify-center h-screen text-muted-foreground; }
 
-.viewer-area { @apply flex-1 overflow-auto; padding: var(--space-lg); }
+.viewer-area { @apply flex-1 overflow-auto; padding: var(--rd-space-lg); }
 .viewer-area-split { @apply overflow-hidden flex; padding: 0; }
 
-.empty-state { @apply flex flex-col items-center justify-center h-full text-center; padding: 0 var(--space-lg); }
-.empty-title { @apply font-medium text-foreground; font-size: var(--text-base); margin-bottom: var(--space-lg); }
-.empty-desc { @apply text-muted-foreground; font-size: var(--text-sm); }
-.empty-cta { @apply bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer; padding: var(--space-sm) var(--space-lg); margin-top: var(--space-lg); font-size: var(--text-sm); }
-.quick-routes { @apply flex flex-wrap justify-center max-w-lg; gap: var(--space-sm); }
-.quick-route-btn { @apply border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer text-foreground; padding: var(--space-sm) var(--space-md); font-size: var(--text-sm); }
-.quick-route-count { @apply text-muted-foreground; font-size: var(--text-xs); margin-left: var(--space-xs); }
-.empty-browse { @apply text-primary hover:underline cursor-pointer; margin-top: var(--space-sm); font-size: var(--text-xs); }
-.empty-hint { @apply text-muted-foreground/60 italic; margin-top: var(--space-lg); font-size: 0.6875rem; }
-.empty-actions { @apply flex flex-col items-center border-t border-border; gap: var(--space-sm); margin-top: var(--space-lg); padding-top: var(--space-lg); }
-.viewer-grid { @apply grid; gap: var(--space-md); }
-.size-controls { @apply flex items-center justify-center; gap: var(--space-sm); padding-top: var(--space-xl); }
+.empty-state { @apply flex flex-col items-center justify-center h-full text-center; padding: 0 var(--rd-space-lg); }
+.empty-title { @apply font-medium text-foreground; font-size: var(--rd-text-base); margin-bottom: var(--rd-space-lg); }
+.empty-desc { @apply text-muted-foreground; font-size: var(--rd-text-sm); }
+.empty-cta { @apply bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer; padding: var(--rd-space-sm) var(--rd-space-lg); margin-top: var(--rd-space-lg); font-size: var(--rd-text-sm); }
+.quick-routes { @apply flex flex-wrap justify-center max-w-lg; gap: var(--rd-space-sm); }
+.quick-route-btn { @apply border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer text-foreground; padding: var(--rd-space-sm) var(--rd-space-md); font-size: var(--rd-text-sm); }
+.quick-route-count { @apply text-muted-foreground; font-size: var(--rd-text-xs); margin-left: var(--rd-space-xs); }
+.empty-browse { @apply text-primary hover:underline cursor-pointer; margin-top: var(--rd-space-sm); font-size: var(--rd-text-xs); }
+.empty-hint { @apply text-muted-foreground/60 italic; margin-top: var(--rd-space-lg); font-size: 0.6875rem; }
+.empty-actions { @apply flex flex-col items-center border-t border-border; gap: var(--rd-space-sm); margin-top: var(--rd-space-lg); padding-top: var(--rd-space-lg); }
+.viewer-grid { @apply grid; gap: var(--rd-space-md); }
+.size-controls { @apply flex items-center justify-center; gap: var(--rd-space-sm); padding-top: var(--rd-space-xl); }
 .size-btn { @apply w-6 h-6 flex items-center justify-center rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer disabled:opacity-30 disabled:pointer-events-none; }
-.size-label { @apply text-muted-foreground; font-size: var(--text-xs); }
+.size-label { @apply text-muted-foreground; font-size: var(--rd-text-xs); }
 .viewer-grid-sm { @apply grid-cols-[repeat(auto-fill,minmax(200px,1fr))]; }
 .viewer-grid-md { @apply grid-cols-[repeat(auto-fill,minmax(320px,1fr))]; }
 .viewer-grid-lg { @apply grid-cols-[repeat(auto-fill,minmax(480px,1fr))]; }
 
 @media (max-width: 768px) {
-  .viewer-area { padding: var(--space-sm); }
+  .viewer-area { padding: var(--rd-space-sm); }
   .viewer-grid-sm { @apply grid-cols-[repeat(auto-fill,minmax(120px,1fr))]; }
   .viewer-grid-md { @apply grid-cols-[repeat(auto-fill,minmax(200px,1fr))]; }
   .viewer-grid-lg { @apply grid-cols-1; }
