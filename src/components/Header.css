@@ -74,23 +74,16 @@
 }
 
 /* Preferences popover */
-.prefs-backdrop {
-  @apply fixed inset-0 z-40;
-}
-.prefs-anchor {
-  @apply relative;
-}
 .prefs-popover {
-  @apply absolute z-50 bg-background border border-border rounded-lg shadow-lg;
-  right: 0;
-  top: calc(100% + 0.5rem);
+  @apply bg-background border border-border rounded-lg shadow-lg z-50;
   padding: var(--rd-space-lg);
   width: 24rem;
+  max-width: calc(100vw - 1rem);
 }
-.prefs-popover::before {
-  content: '';
-  @apply absolute -top-2 w-3 h-3 bg-background border-l border-t border-border rotate-45;
-  right: 1rem;
+.prefs-arrow {
+  fill: var(--color-background);
+  stroke: var(--color-border);
+  stroke-width: 1;
 }
 .prefs-row {
   @apply flex items-center justify-between border-b border-border;
@@ -152,11 +145,5 @@
   .btn-label svg {
     @apply shrink-0;
     font-size: initial;
-  }
-  .prefs-popover {
-    @apply fixed w-auto;
-    right: var(--rd-space-sm);
-    left: var(--rd-space-sm);
-    top: auto;
   }
 }

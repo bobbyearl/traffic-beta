@@ -52,5 +52,5 @@
 }
 
 @media (max-width: 768px) {
-  .map-container .gm-bundled-control { transform: scale(0.75); transform-origin: bottom right; }
+  .map-container .gm-bundled-control { transform: scale(0.8); transform-origin: bottom right; margin-right: -4px; margin-bottom: -4px; }
 }
