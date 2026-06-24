@@ -92,7 +92,7 @@
   @apply flex items-center cursor-pointer hover:bg-muted/50 text-foreground;
   gap: var(--rd-space-sm);
   padding: var(--rd-space-xs) var(--rd-space-md);
-  padding-left: var(--rd-space-2xl);
+  padding-left: var(--rd-space-xl);
   font-size: var(--rd-text-sm);
 }
 .camera-row input[type='checkbox'] {
