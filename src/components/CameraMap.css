@@ -11,9 +11,14 @@
   border: none !important;
 }
 .map-pin {
-  @apply w-2.5 h-2.5 rounded-full cursor-pointer;
+  @apply w-2.5 h-2.5 rounded-full cursor-pointer relative;
   background-color: var(--color-pin);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-white) 60%, transparent);
+}
+.map-pin::before {
+  content: '';
+  @apply absolute rounded-full;
+  inset: -8px;
 }
 .dark .map-pin {
   background-color: var(--color-pin-dark);
@@ -52,5 +57,16 @@
 }
 
 @media (max-width: 768px) {
-  .map-container .gm-bundled-control { transform: scale(0.8); transform-origin: bottom right; margin-right: -4px; margin-bottom: -4px; }
+  .map-container .gm-bundled-control { @apply hidden; }
+}
+
+.map-wrapper {
+  @apply relative w-full h-full;
+}
+.map-locate-btn {
+  @apply absolute z-10 bg-background border border-border rounded-md shadow-md flex items-center justify-center cursor-pointer hover:bg-muted transition-colors text-foreground;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }

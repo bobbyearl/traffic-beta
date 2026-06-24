@@ -8,7 +8,7 @@
 .viewer-area { @apply flex-1 overflow-auto; padding: var(--rd-space-lg); }
 .viewer-area-split { @apply overflow-hidden flex; padding: 0; }
 
-.empty-state { @apply flex flex-col items-center justify-center h-full text-center; padding: 0 var(--rd-space-lg); }
+.empty-state { @apply flex flex-col items-center justify-center min-h-full text-center; padding: var(--rd-space-xl) var(--rd-space-lg); }
 .empty-title { @apply font-medium text-foreground; font-size: var(--rd-text-base); margin-bottom: var(--rd-space-lg); }
 .empty-desc { @apply text-muted-foreground; font-size: var(--rd-text-sm); }
 .empty-cta { @apply bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary-hover transition-colors cursor-pointer; padding: var(--rd-space-sm) var(--rd-space-lg); margin-top: var(--rd-space-lg); font-size: var(--rd-text-sm); }

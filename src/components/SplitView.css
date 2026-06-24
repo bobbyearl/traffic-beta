@@ -28,7 +28,8 @@
   .split-map-panel .map-container { min-height: 0; }
   .split-handle { @apply w-full cursor-row-resize relative z-10 flex items-center justify-center bg-border/50; height: 0.625rem; touch-action: none; }
   .split-handle-grip { @apply rounded-full; width: 2.5rem; height: 0.25rem; }
-  .split-feeds-panel { @apply w-full; }
+  .split-feeds-panel { @apply w-full overflow-y-auto; }
+  .split-empty { @apply justify-start h-auto; padding-top: var(--rd-space-lg); }
   .split-feeds-sm { @apply grid-cols-3; }
   .split-feeds-md { @apply grid-cols-2; }
   .split-feeds-lg { @apply grid-cols-1; }
