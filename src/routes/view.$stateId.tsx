@@ -5,23 +5,15 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { CameraFeed } from '../components/CameraFeed';
 import { DetailModal } from '../components/DetailModal';
-import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { SplitView } from '../components/SplitView';
 import { CURATED_ROUTES } from '../lib/routes';
-import { TrafficProvider, useTraffic } from '../lib/TrafficContext';
+import { useTraffic } from '../lib/TrafficContext';
 import { type ViewSearchParams } from '../lib/types';
 
 export const Route = createFileRoute('/view/$stateId')({
-  component: () => (
-    <ErrorBoundary>
-      <TrafficProvider>
-        <Home />
-      </TrafficProvider>
-    </ErrorBoundary>
-  ),
   validateSearch: (search: Record<string, unknown>): ViewSearchParams => ({
     selected: (search.selected as string) || undefined,
     map: search.map === '0' ? '0' : undefined,
@@ -60,7 +52,7 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
   );
 }
 
-function Home() {
+export function Home() {
   const { isLoading, stateId, selectedCameras, mode, showMap, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, setDetailCam } = useTraffic();
 
   if (isLoading) {

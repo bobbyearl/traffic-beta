@@ -3,7 +3,7 @@
 .state-selector-trigger {
   @apply flex items-center cursor-pointer whitespace-nowrap transition-colors rounded-md border border-border bg-background hover:border-foreground/20;
   gap: var(--rd-space-sm);
-  padding: var(--rd-space-sm) var(--rd-space-sm);
+  padding: var(--rd-space-xs) var(--rd-space-sm);
   font-size: var(--rd-text-sm);
   color: var(--color-foreground);
 }
@@ -37,7 +37,7 @@
 .state-selector-option {
   @apply flex items-center w-full text-left cursor-pointer hover:bg-muted transition-colors whitespace-nowrap;
   gap: var(--rd-space-sm);
-  padding: var(--rd-space-sm) var(--rd-space-sm);
+  padding: var(--rd-space-xs) var(--rd-space-sm);
   font-size: var(--rd-text-sm);
   color: var(--color-foreground);
 }

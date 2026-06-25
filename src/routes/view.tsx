@@ -1,7 +1,16 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { TrafficProvider } from '../lib/TrafficContext';
+import { Home } from './view.$stateId';
 
 export const Route = createFileRoute('/view')({
-  beforeLoad: () => {
-    throw redirect({ to: '/view/$stateId', params: { stateId: 'sc' } } as never);
-  },
+  component: () => (
+    <ErrorBoundary>
+      <TrafficProvider>
+        <Home />
+        <Outlet />
+      </TrafficProvider>
+    </ErrorBoundary>
+  ),
 });

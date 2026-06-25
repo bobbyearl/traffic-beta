@@ -146,10 +146,7 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
     navigate({
       to: '/view/$stateId',
       params: { stateId: s },
-      search: {
-        selected: undefined,
-        detail: undefined,
-      } as ViewSearchParams,
+      search: { map: params.map, list: params.list } as ViewSearchParams,
     });
 
   const [layoutKey, setLayoutKey] = useState(0);
