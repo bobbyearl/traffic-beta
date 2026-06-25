@@ -3,7 +3,7 @@
 .header-bar {
   @apply border-b shrink-0 bg-muted relative;
   border-color: var(--color-border-strong);
-  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08);
+  box-shadow: 0 2px 4px -1px color-mix(in srgb, var(--color-black) 8%, transparent);
 }
 .header-nav {
   @apply flex items-center justify-between;

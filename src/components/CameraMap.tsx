@@ -249,11 +249,11 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
     : cameras.filter((cam) => selectedIds.has(cam.id));
 
   // deck.gl overlay for all markers (WebGL, handles thousands instantly)
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const deckOverlayRef = useRef<any>(null);
-  const prevThemeRef = useRef(resolvedTheme);
   const deckModulesRef = useRef<{ GoogleMapsOverlay: any; ScatterplotLayer: any } | null>(null);
   const handleMarkerClickRef = useRef(handleMarkerClick);
-  handleMarkerClickRef.current = handleMarkerClick;
+  handleMarkerClickRef.current = handleMarkerClick; // eslint-disable-line react-hooks/refs
 
   useEffect(() => {
     if (!map || cameras.length === 0) { return; }
@@ -346,6 +346,7 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
       }
     };
   }, []);
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const selectedCamerasInView = visibleCameras.filter((cam) => selectedIds.has(cam.id));
 

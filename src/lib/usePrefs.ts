@@ -7,9 +7,11 @@ interface Prefs {
   density?: string;
   mode?: string;
   sw?: number;
+  map?: boolean;
+  list?: boolean;
 }
 
-const DEFAULTS: Required<Prefs> = { grid: 'lg', density: 'open', mode: 'video', sw: 70 };
+const DEFAULTS: Required<Prefs> = { grid: 'lg', density: 'open', mode: 'video', sw: 70, map: true, list: true };
 
 let cached: Prefs = readStorage();
 
@@ -55,12 +57,16 @@ export function usePrefs() {
   const density = prefs.density ?? DEFAULTS.density;
   const mode = prefs.mode ?? DEFAULTS.mode;
   const sw = prefs.sw ?? DEFAULTS.sw;
+  const showMap = prefs.map ?? DEFAULTS.map;
+  const showList = prefs.list ?? DEFAULTS.list;
 
   const setGrid = useCallback((v: string | undefined) => setPrefs({ grid: v ?? DEFAULTS.grid }), []);
   const setDensity = useCallback((v: string | undefined) => setPrefs({ density: v ?? DEFAULTS.density }), []);
   const setMode = useCallback((v: string | undefined) => setPrefs({ mode: v ?? DEFAULTS.mode }), []);
   const setSw = useCallback((v: number) => setPrefs({ sw: v }), []);
+  const setShowMap = useCallback((v: boolean) => setPrefs({ map: v }), []);
+  const setShowList = useCallback((v: boolean) => setPrefs({ list: v }), []);
   const resetPrefs = useCallback(() => { localStorage.removeItem(STORAGE_KEY); notify(); }, []);
 
-  return { grid, density, mode, sw, setGrid, setDensity, setMode, setSw, resetPrefs };
+  return { grid, density, mode, sw, showMap, showList, setGrid, setDensity, setMode, setSw, setShowMap, setShowList, resetPrefs };
 }

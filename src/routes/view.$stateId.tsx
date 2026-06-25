@@ -4,12 +4,12 @@ import './view.css';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { CameraFeed } from '../components/CameraFeed';
-import { type Camera } from '../lib/cameras';
 import { DetailModal } from '../components/DetailModal';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 import { SplitView } from '../components/SplitView';
+import { type Camera } from '../lib/cameras';
 import { CURATED_ROUTES } from '../lib/routes';
 import { useTraffic } from '../lib/TrafficContext';
 import { type ViewSearchParams } from '../lib/types';
@@ -17,8 +17,6 @@ import { type ViewSearchParams } from '../lib/types';
 export const Route = createFileRoute('/view/$stateId')({
   validateSearch: (search: Record<string, unknown>): ViewSearchParams => ({
     selected: (search.selected as string) || undefined,
-    map: search.map === '0' ? '0' : undefined,
-    list: search.list === '0' ? '0' : undefined,
     detail: (search.detail as string) || undefined,
     tab: search.tab === 'regions' ? 'regions' : undefined,
     panel: search.panel === '1' ? '1' : undefined,
