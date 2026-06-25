@@ -1,6 +1,7 @@
 import './SplitView.css';
 
-import { useCallback, useRef } from 'react';
+import { useMap } from '@vis.gl/react-google-maps';
+import { useCallback, useRef, useState } from 'react';
 
 import { useTraffic } from '../lib/TrafficContext';
 import { EmptyState } from '../routes/view.$stateId';
@@ -18,9 +19,14 @@ export function SplitView({ stateId, onBrowse }: SplitViewProps) {
   const mapPanelRef = useRef<HTMLDivElement>(null);
   const localPercent = useRef(splitWidth);
   const dragging = useRef(false);
+  const rafRef = useRef<number>(0);
+  const map = useMap();
+  const [ghostPercent, setGhostPercent] = useState<number | null>(null);
 
   const startDrag = useCallback(() => {
     dragging.current = true;
+    (window as any).__deckResizing = true;
+    window.dispatchEvent(new Event('deckHide'));
     const isMobile = window.innerWidth < 768;
     document.body.style.cursor = isMobile ? 'row-resize' : 'col-resize';
     document.body.style.userSelect = 'none';
@@ -32,25 +38,34 @@ export function SplitView({ stateId, onBrowse }: SplitViewProps) {
 
     const move = (ev: MouseEvent | TouchEvent) => {
       if ('touches' in ev) { ev.preventDefault(); }
-      if (!containerRef.current) { return; }
-      const rect = containerRef.current.getBoundingClientRect();
-      const pos = getPos(ev);
-      if (isMobile) {
-        const percent = Math.min(80, Math.max(20, ((pos.y - rect.top) / rect.height) * 100));
-        localPercent.current = percent;
-        if (mapPanelRef.current) { mapPanelRef.current.style.height = `${percent}%`; }
-      } else {
-        const percent = Math.min(85, Math.max(30, ((pos.x - rect.left) / rect.width) * 100));
-        localPercent.current = percent;
-        if (mapPanelRef.current) { mapPanelRef.current.style.width = `${percent}%`; }
-      }
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        if (!containerRef.current) { return; }
+        const rect = containerRef.current.getBoundingClientRect();
+        const pos = getPos(ev);
+        if (isMobile) {
+          localPercent.current = Math.min(80, Math.max(20, ((pos.y - rect.top) / rect.height) * 100));
+        } else {
+          localPercent.current = Math.min(85, Math.max(30, ((pos.x - rect.left) / rect.width) * 100));
+        }
+        setGhostPercent(localPercent.current);
+      });
     };
     const up = () => {
       dragging.current = false;
+      (window as any).__deckResizing = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      // Apply final size in one shot
+      const isMob = window.innerWidth < 768;
+      if (mapPanelRef.current) {
+        if (isMob) { mapPanelRef.current.style.height = `${localPercent.current}%`; }
+        else { mapPanelRef.current.style.width = `${localPercent.current}%`; }
+      }
       setSplitWidth(localPercent.current);
+      setGhostPercent(null);
       window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('deckReshow'));
       document.removeEventListener('mousemove', move);
       document.removeEventListener('mouseup', up);
       document.removeEventListener('touchmove', move);
@@ -66,6 +81,9 @@ export function SplitView({ stateId, onBrowse }: SplitViewProps) {
 
   return (
     <div className="split-container" ref={containerRef}>
+      {ghostPercent !== null && (
+        <div className="split-ghost" style={{ left: `${ghostPercent}%` }} />
+      )}
       <div className="split-map-panel" style={{ width: showList ? `${splitWidth}%` : '100%' }} ref={mapPanelRef}>
         <CameraMap stateId={stateId} markersOnly={showList} />
       </div>

@@ -299,6 +299,44 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
     run();
   }, [map, cameras, resolvedTheme]);
 
+  // Hide/show deck.gl layers during split resize to prevent flicker
+  useEffect(() => {
+    const hide = () => {
+      if (deckOverlayRef.current) {
+        deckOverlayRef.current.setProps({ layers: [] });
+      }
+    };
+    const reshow = () => {
+      if (deckOverlayRef.current && deckModulesRef.current) {
+        const { ScatterplotLayer } = deckModulesRef.current;
+        const rgb = [220, 50, 160];
+        const layer = new ScatterplotLayer({
+          id: 'cameras',
+          data: cameras,
+          getPosition: (d: any) => [d.lng, d.lat],
+          getRadius: 5,
+          radiusUnits: 'pixels' as const,
+          getFillColor: [...rgb, 220] as any,
+          getLineColor: [255, 255, 255, 180] as any,
+          lineWidthMinPixels: 1,
+          stroked: true,
+          pickable: true,
+          onHover: (info: any) => {
+            const wrapper = map?.getDiv().closest('.map-wrapper');
+            if (wrapper) { (wrapper as HTMLElement).classList.toggle('map-pointer', !!info.object); }
+          },
+          onClick: (info: any) => {
+            if (info.object) { handleMarkerClickRef.current(info.object.id); }
+          },
+        });
+        deckOverlayRef.current.setProps({ layers: [layer] });
+      }
+    };
+    window.addEventListener('deckHide', hide);
+    window.addEventListener('deckReshow', reshow);
+    return () => { window.removeEventListener('deckHide', hide); window.removeEventListener('deckReshow', reshow); };
+  }, [map, cameras]);
+
   // Cleanup only on unmount
   useEffect(() => {
     return () => {
