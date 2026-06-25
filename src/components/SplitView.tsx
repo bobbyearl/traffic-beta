@@ -1,7 +1,6 @@
 import './SplitView.css';
 
-import { useMap } from '@vis.gl/react-google-maps';
-import { autoUpdate, flip, offset, shift, useClick, useDismiss, useFloating, useHover, useInteractions } from '@floating-ui/react';
+import { autoUpdate, offset, useFloating, useHover, useInteractions } from '@floating-ui/react';
 import { PanelRightClose } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 
@@ -51,12 +50,11 @@ export function SplitView({ stateId, onBrowse, onCloseMap, onCloseList }: SplitV
   const localPercent = useRef(splitWidth);
   const dragging = useRef(false);
   const rafRef = useRef<number>(0);
-  const map = useMap();
   const [ghostPercent, setGhostPercent] = useState<number | null>(null);
 
   const startDrag = useCallback(() => {
     dragging.current = true;
-    (window as any).__deckResizing = true;
+    (window as any).__deckResizing = true; // eslint-disable-line @typescript-eslint/no-explicit-any
     window.dispatchEvent(new Event('deckHide'));
     const isMobile = window.innerWidth < 768;
     document.body.style.cursor = isMobile ? 'row-resize' : 'col-resize';
@@ -84,7 +82,7 @@ export function SplitView({ stateId, onBrowse, onCloseMap, onCloseList }: SplitV
     };
     const up = () => {
       dragging.current = false;
-      (window as any).__deckResizing = false;
+      (window as any).__deckResizing = false; // eslint-disable-line @typescript-eslint/no-explicit-any
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
       // Apply final size in one shot

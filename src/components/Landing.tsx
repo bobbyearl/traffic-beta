@@ -5,9 +5,10 @@ import { Link } from '@tanstack/react-router';
 import { Camera, Info, Map, Share2, Smartphone } from 'lucide-react';
 import { useEffect } from 'react';
 
-import { getStateConfig, STATES } from '../lib/cameras';
+import { STATES } from '../lib/cameras';
 import { emptyViewSearch } from '../lib/types';
 import { Footer } from './Footer';
+import { StateIcon } from './StateSelector';
 
 export function Landing() {
   const queryClient = useQueryClient();
@@ -36,8 +37,8 @@ export function Landing() {
             View {totalCameras.toLocaleString()} live traffic cameras across {STATES.length} states.
           </p>
           <div className="hero-actions">
-            <Link to="/view/$stateId" params={{ stateId: 'sc' }} search={emptyViewSearch} className="hero-cta">
-              Get Started
+            <Link to="/view/$stateId" params={{ stateId: localStorage.getItem('roadie-last-state') || 'sc' }} search={emptyViewSearch} className="hero-cta">
+              {localStorage.getItem('roadie-last-state') && <StateIcon id={localStorage.getItem('roadie-last-state')!} />} Get Started
             </Link>
           </div>
         </div>

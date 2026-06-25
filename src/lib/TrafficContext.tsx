@@ -87,10 +87,8 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
     staleTime: Infinity,
   });
 
-  const { grid: cardSize, density, mode: prefsMode, sw: splitWidth } = prefs;
+  const { grid: cardSize, density, mode: prefsMode, sw: splitWidth, showMap, showList } = prefs;
   const mode = stateConfig.supportsVideo ? prefsMode : 'image';
-  const showMap = params.map !== '0';
-  const showList = params.list !== '0';
   const sidebarTab = params.tab ?? 'routes';
   const sidebarOpen = params.panel === '1';
 
@@ -126,12 +124,11 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
   const selectRoute = (ids: string[]) => setSelected(new Set(ids));
   const setDetailCam = (cam: Camera | null) =>
     navigate({ search: { ...params, detail: cam?.id || undefined } as ViewSearchParams });
-  const toggleMap = () => navigate({ search: { ...params, map: params.map === '0' ? undefined : '0' } as ViewSearchParams });
-  const toggleList = () => navigate({ search: { ...params, list: params.list === '0' ? undefined : '0' } as ViewSearchParams });
+  const toggleMap = () => prefs.setShowMap(!showMap);
+  const toggleList = () => prefs.setShowList(!showList);
   const setViewMode = (m: string) => {
-    const map = m === 'list' ? '0' : undefined;
-    const list = m === 'map' ? '0' : undefined;
-    navigate({ search: { ...params, map, list } as ViewSearchParams });
+    prefs.setShowMap(m !== 'list');
+    prefs.setShowList(m !== 'map');
   };
   const setMode = (m: string | undefined) => prefs.setMode(m);
   const setGrid = (g: string | undefined) => prefs.setGrid(g);
@@ -142,12 +139,14 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
     prefs.setSw(Math.min(85, Math.max(30, rounded)));
   };
   const setSidebarOpen = (open: boolean) => navigate({ search: { ...params, panel: open ? '1' : undefined } as ViewSearchParams });
-  const setState = (s: string) =>
+  const setState = (s: string) => {
+    localStorage.setItem('roadie-last-state', s);
     navigate({
       to: '/view/$stateId',
       params: { stateId: s },
-      search: { map: params.map, list: params.list } as ViewSearchParams,
+      search: {} as ViewSearchParams,
     });
+  };
 
   const [layoutKey, setLayoutKey] = useState(0);
   const triggerLayout = () => setLayoutKey((k) => k + 1);
