@@ -64,6 +64,10 @@
 .map-wrapper {
   @apply relative w-full h-full;
 }
+.map-pointer,
+.map-pointer * {
+  cursor: pointer !important;
+}
 .map-locate-btn {
   @apply absolute z-10 bg-background border border-border rounded-md shadow-md flex items-center justify-center cursor-pointer hover:bg-muted transition-colors text-foreground;
   top: 0.625rem;

@@ -85,7 +85,6 @@ export function TrafficProvider({ children }: { children: ReactNode }) {
       return stateConfig.parser(data);
     },
     staleTime: Infinity,
-    placeholderData: (prev) => prev,
   });
 
   const { grid: cardSize, density, mode: prefsMode, sw: splitWidth } = prefs;

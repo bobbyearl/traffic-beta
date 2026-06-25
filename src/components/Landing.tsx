@@ -12,16 +12,17 @@ import { Footer } from './Footer';
 export function Landing() {
   const queryClient = useQueryClient();
 
-  // Prefetch default state data so map loads instantly on navigation
+  // Prefetch all state data so map loads instantly on navigation
   useEffect(() => {
-    const sc = getStateConfig('sc');
-    queryClient.prefetchQuery({
-      queryKey: ['cameras', 'sc'],
-      queryFn: async () => {
-        const res = await fetch(import.meta.env.BASE_URL + sc.dataFile);
-        return sc.parser(await res.json());
-      },
-      staleTime: Infinity,
+    STATES.forEach((s) => {
+      queryClient.prefetchQuery({
+        queryKey: ['cameras', s.id],
+        queryFn: async () => {
+          const res = await fetch(import.meta.env.BASE_URL + s.dataFile);
+          return s.parser(await res.json());
+        },
+        staleTime: Infinity,
+      });
     });
   }, [queryClient]);
   const totalCameras = STATES.reduce((sum, s) => sum + s.cameraCount, 0);

@@ -39,11 +39,13 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
   const { cameras, selectedIds, selectedCameras, toggleCamera, mode, cardSize, setDetailCam, layoutKey } = useTraffic();
   const { resolvedTheme } = useTheme();
   const map = useMap();
+  const prevStateRef = useRef(stateId);
   useEffect(() => {
-    if (map) {
+    if (map && stateId !== prevStateRef.current) {
       const config = getStateConfig(stateId);
       map.setCenter(config.defaultCenter);
       map.setZoom(config.defaultZoom);
+      prevStateRef.current = stateId;
     }
   }, [map, stateId]);
 
@@ -248,17 +250,21 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
 
   // deck.gl overlay for all markers (WebGL, handles thousands instantly)
   const deckOverlayRef = useRef<any>(null);
-  const deckInitRef = useRef(false);
+  const prevThemeRef = useRef(resolvedTheme);
+  const deckModulesRef = useRef<{ GoogleMapsOverlay: any; ScatterplotLayer: any } | null>(null);
+  const handleMarkerClickRef = useRef(handleMarkerClick);
+  handleMarkerClickRef.current = handleMarkerClick;
 
   useEffect(() => {
     if (!map || cameras.length === 0) { return; }
 
-    const updateLayer = async () => {
-      const { GoogleMapsOverlay } = await import('@deck.gl/google-maps');
-      const { ScatterplotLayer } = await import('@deck.gl/layers');
-
-      const pinColor = getComputedStyle(document.documentElement).getPropertyValue('--color-pin').trim() || '#A85191';
-      const rgb = [parseInt(pinColor.slice(1, 3), 16), parseInt(pinColor.slice(3, 5), 16), parseInt(pinColor.slice(5, 7), 16)];
+    const run = async () => {
+      if (!deckModulesRef.current) {
+        const [gm, layers] = await Promise.all([import('@deck.gl/google-maps'), import('@deck.gl/layers')]);
+        deckModulesRef.current = { GoogleMapsOverlay: gm.GoogleMapsOverlay, ScatterplotLayer: layers.ScatterplotLayer };
+      }
+      const { GoogleMapsOverlay, ScatterplotLayer } = deckModulesRef.current;
+      const rgb = [220, 50, 160]; // vibrant pink, visible on both light and dark maps
 
       const layer = new ScatterplotLayer({
         id: 'cameras',
@@ -266,32 +272,32 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
         getPosition: (d: any) => [d.lng, d.lat],
         getRadius: 5,
         radiusUnits: 'pixels' as const,
-        getFillColor: [...rgb, 200] as any,
-        getLineColor: [255, 255, 255, 180] as any,
+        getFillColor: [...rgb, 220] as any,
+        getLineColor: resolvedTheme === 'dark' ? [255, 255, 255, 120] : [255, 255, 255, 200] as any,
         lineWidthMinPixels: 1,
         stroked: true,
         pickable: true,
-        autoHighlight: true,
         onHover: (info: any) => {
-          const container = map.getDiv();
-          if (container) { container.style.cursor = info.object ? 'pointer' : ''; }
+          const wrapper = map.getDiv().closest('.map-wrapper');
+          if (wrapper) { (wrapper as HTMLElement).classList.toggle('map-pointer', !!info.object); }
         },
         onClick: (info: any) => {
-          if (info.object) { handleMarkerClick(info.object.id); }
+          if (info.object) { handleMarkerClickRef.current(info.object.id); }
         },
       });
 
-      if (!deckOverlayRef.current) {
+      if (!deckOverlayRef.current || deckOverlayRef.current._map !== map) {
+        if (deckOverlayRef.current) { deckOverlayRef.current.setMap(null); }
         const overlay = new GoogleMapsOverlay({ layers: [layer] });
         overlay.setMap(map);
+        (overlay as any)._map = map;
         deckOverlayRef.current = overlay;
-        deckInitRef.current = true;
       } else {
         deckOverlayRef.current.setProps({ layers: [layer] });
       }
     };
-    updateLayer();
-  }, [map, cameras, handleMarkerClick]);
+    run();
+  }, [map, cameras, resolvedTheme]);
 
   // Cleanup only on unmount
   useEffect(() => {

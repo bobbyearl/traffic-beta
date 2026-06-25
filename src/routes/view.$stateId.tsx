@@ -45,7 +45,7 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
         <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a>
       )}
       <div className="empty-actions">
-        {showMap && <span className="empty-map-hint">Select markers on the map</span>}
+        {showMap && <span className="empty-map-hint">Select markers on the map or</span>}
         <button className="quick-route-btn" onClick={onBrowse}>Browse Cameras</button>
       </div>
     </div>
@@ -53,11 +53,7 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
 }
 
 export function Home() {
-  const { isLoading, stateId, selectedCameras, mode, showMap, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, setDetailCam } = useTraffic();
-
-  if (isLoading) {
-    return <div className="loading">Loading cameras...</div>;
-  }
+  const { stateId, selectedCameras, mode, showMap, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, setDetailCam } = useTraffic();
 
   return (
     <div className={`page ${density === 'compact' ? 'density-compact' : ''}`}>
