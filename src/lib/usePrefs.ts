@@ -11,7 +11,9 @@ interface Prefs {
 
 const DEFAULTS: Required<Prefs> = { grid: 'lg', density: 'open', mode: 'video', sw: 70 };
 
-function getPrefs(): Prefs {
+let cached: Prefs = readStorage();
+
+function readStorage(): Prefs {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   } catch {
@@ -19,17 +21,20 @@ function getPrefs(): Prefs {
   }
 }
 
+function getSnapshot() { return cached; }
+
 let listeners: Array<() => void> = [];
 function subscribe(cb: () => void) {
   listeners.push(cb);
   return () => { listeners = listeners.filter((l) => l !== cb); };
 }
-function notify() { listeners.forEach((l) => l()); }
+function notify() {
+  cached = readStorage();
+  listeners.forEach((l) => l());
+}
 
 function setPrefs(patch: Partial<Prefs>) {
-  const current = getPrefs();
-  const next = { ...current, ...patch };
-  // Remove keys that match defaults
+  const next = { ...cached, ...patch };
   for (const [k, v] of Object.entries(next)) {
     if (v === DEFAULTS[k as keyof Prefs] || v === undefined) {
       delete next[k as keyof Prefs];
@@ -44,7 +49,7 @@ function setPrefs(patch: Partial<Prefs>) {
 }
 
 export function usePrefs() {
-  const prefs = useSyncExternalStore(subscribe, getPrefs);
+  const prefs = useSyncExternalStore(subscribe, getSnapshot);
 
   const grid = prefs.grid ?? DEFAULTS.grid;
   const density = prefs.density ?? DEFAULTS.density;
