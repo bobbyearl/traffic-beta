@@ -264,7 +264,7 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
         deckModulesRef.current = { GoogleMapsOverlay: gm.GoogleMapsOverlay, ScatterplotLayer: layers.ScatterplotLayer };
       }
       const { GoogleMapsOverlay, ScatterplotLayer } = deckModulesRef.current;
-      const rgb = [220, 50, 160]; // vibrant pink, visible on both light and dark maps
+      const rgb = [249, 115, 22]; // orange - visible on both themes, distinct from pink accent
 
       const layer = new ScatterplotLayer({
         id: 'cameras',
@@ -376,7 +376,7 @@ function MapInner({ mapId, stateId, markersOnly }: { mapId: string; stateId: str
       className="map-container"
       onCameraChanged={handleCameraChange}
       streetViewControl={false}
-      fullscreenControl={!markersOnly}
+      fullscreenControl={false}
       zoomControl={false}
       mapTypeControl={false}
       clickableIcons={false}

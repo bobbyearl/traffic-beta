@@ -5,7 +5,24 @@
 .main { @apply flex-1 flex flex-col min-w-0; }
 .loading { @apply flex items-center justify-center h-screen text-muted-foreground; }
 
-.viewer-area { @apply flex-1 overflow-auto; padding: var(--rd-space-lg); }
+.viewer-area { @apply flex-1 overflow-auto relative; padding: var(--rd-space-lg); }
+
+.view-close-wrapper {
+  @apply absolute z-20;
+  top: 0;
+  right: 0;
+}
+.view-close-btn {
+  @apply flex items-center justify-center bg-background border border-border rounded-b-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer;
+  width: 1.75rem;
+  height: 1.5rem;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+  border-top: none;
+}
+.view-close-tooltip {
+  @apply z-50 bg-foreground text-background rounded px-2 py-1 whitespace-nowrap pointer-events-none;
+  font-size: 0.6875rem;
+}
 .viewer-area-split { @apply overflow-hidden flex; padding: 0; }
 
 .empty-state { @apply flex flex-col items-center justify-center min-h-full text-center; padding: var(--rd-space-xl) var(--rd-space-lg); }

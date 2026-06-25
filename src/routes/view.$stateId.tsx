@@ -30,30 +30,34 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
   return (
     <div className="empty-state">
       <p className="empty-title">No Selected Cameras</p>
+
       {hasCuratedRoutes ? (
-        <div className="quick-routes">
-          {CURATED_ROUTES.map((route) => (
-            <button key={route.name} className="quick-route-btn" onClick={() => selectRoute(route.ids)}>
-              {route.name} <span className="quick-route-count">{route.ids.length}</span>
-            </button>
-          ))}
-        </div>
+        <>
+          <p className="empty-map-hint">Try a Curated Route or <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
+          <div className="quick-routes">
+            {CURATED_ROUTES.map((route) => (
+              <button key={route.name} className="quick-route-btn" onClick={() => selectRoute(route.ids)}>
+                {route.name} <span className="quick-route-count">{route.ids.length}</span>
+              </button>
+            ))}
+          </div>
+        </>
       ) : (
-        <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a>
+        <p className="empty-map-hint"><a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
       )}
-      {hasCuratedRoutes && (
-        <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a>
-      )}
+
       <div className="empty-actions">
-        {showMap && <span className="empty-map-hint">Select markers on the map or</span>}
-        <button className="quick-route-btn" onClick={onBrowse}>Browse Cameras</button>
+        {showMap && <span className="empty-map-hint">Select a map marker or</span>}
+        <div className="quick-routes">
+          <button className="quick-route-btn" onClick={onBrowse}>Browse Cameras</button>
+        </div>
       </div>
     </div>
   );
 }
 
 export function Home() {
-  const { stateId, selectedCameras, mode, showMap, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, setDetailCam } = useTraffic();
+  const { stateId, selectedCameras, mode, showMap, showList, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, toggleMap, toggleList, setDetailCam } = useTraffic();
 
   return (
     <div className={`page ${density === 'compact' ? 'density-compact' : ''}`}>
@@ -62,7 +66,7 @@ export function Home() {
         <div className="main">
           <div className={`viewer-area ${showMap ? 'viewer-area-split' : ''}`}>
             {showMap ? (
-              <SplitView stateId={stateId} onBrowse={() => setSidebarOpen(true)} />
+              <SplitView stateId={stateId} onBrowse={() => setSidebarOpen(true)} onCloseMap={showList ? toggleMap : undefined} onCloseList={showList ? toggleList : undefined} />
             ) : selectedCameras.length === 0 ? (
               <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} showMap={showMap} />
             ) : (

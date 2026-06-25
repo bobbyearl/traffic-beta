@@ -57,8 +57,12 @@
   @apply w-full aspect-video object-cover;
 }
 
-@media (max-width: 768px) {
-  .map-container .gm-bundled-control { @apply hidden; }
+.map-container .gm-bundled-control,
+.map-container .gm-fullscreen-control,
+.map-container .gm-style-mtc,
+.map-container button[aria-label="Toggle fullscreen view"],
+.map-container button[aria-label="Keyboard shortcuts"] {
+  @apply hidden;
 }
 
 .map-wrapper {
@@ -70,7 +74,7 @@
 }
 .map-locate-btn {
   @apply absolute z-10 bg-background border border-border rounded-md shadow-md flex items-center justify-center cursor-pointer hover:bg-muted transition-colors text-foreground;
-  top: 0.625rem;
+  bottom: 1rem;
   right: 0.625rem;
   width: 2.5rem;
   height: 2.5rem;

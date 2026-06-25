@@ -25,7 +25,7 @@ export function Header({ sidebarOpen, onSidebarToggle }: HeaderProps) {
   const handleShare = () => {
     const url = window.location.href;
     if (navigator.share) {
-      navigator.share({ title: 'RoadieApp', url });
+      navigator.share({ title: 'Roadie App', url });
     } else {
       navigator.clipboard.writeText(url);
     }
