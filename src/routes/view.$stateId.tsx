@@ -4,6 +4,7 @@ import './view.css';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { CameraFeed } from '../components/CameraFeed';
+import { type Camera } from '../lib/cameras';
 import { DetailModal } from '../components/DetailModal';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
@@ -24,8 +25,24 @@ export const Route = createFileRoute('/view/$stateId')({
   }),
 });
 
-export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateId: string; selectRoute: (ids: string[]) => void; onBrowse: () => void; showMap?: boolean }) {
+export function EmptyState({ stateId, cameras, selectRoute, toggleCamera, onBrowse, showMap }: { stateId: string; cameras: Camera[]; selectRoute: (ids: string[]) => void; toggleCamera: (id: string) => void; onBrowse: () => void; showMap?: boolean }) {
   const hasCuratedRoutes = stateId === 'sc';
+
+  const handleClosest = () => {
+    if (!navigator.geolocation) { return; }
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude, longitude } = pos.coords;
+      const allCams = cameras.length ? cameras : [];
+      if (!allCams.length) { return; }
+      let closest = allCams[0];
+      let minDist = Infinity;
+      for (const cam of allCams) {
+        const d = (cam.lat - latitude) ** 2 + (cam.lng - longitude) ** 2;
+        if (d < minDist) { minDist = d; closest = cam; }
+      }
+      toggleCamera(closest.id);
+    });
+  };
 
   return (
     <div className="empty-state">
@@ -33,7 +50,7 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
 
       {hasCuratedRoutes ? (
         <>
-          <p className="empty-map-hint">Try a Curated Route or <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
+          <p className="empty-map-hint empty-route-hint">Try a Curated Route or <a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
           <div className="quick-routes">
             {CURATED_ROUTES.map((route) => (
               <button key={route.name} className="quick-route-btn" onClick={() => selectRoute(route.ids)}>
@@ -43,21 +60,22 @@ export function EmptyState({ stateId, selectRoute, onBrowse, showMap }: { stateI
           </div>
         </>
       ) : (
-        <p className="empty-map-hint"><a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
+        <p className="empty-map-hint empty-route-hint"><a className="empty-browse" href={`https://github.com/bobbyearl/roadie/issues/new?title=Route+request:+${stateId.toUpperCase()}&labels=route-request`} target="_blank" rel="noopener">Request Curated Route</a></p>
       )}
 
       <div className="empty-actions">
-        {showMap && <span className="empty-map-hint">Select a map marker or</span>}
         <div className="quick-routes">
+          <button className="quick-route-btn" onClick={handleClosest}>Open Closest Camera</button>
           <button className="quick-route-btn" onClick={onBrowse}>Browse Cameras</button>
         </div>
+        {showMap && <p className="empty-map-hint">or select a map marker</p>}
       </div>
     </div>
   );
 }
 
 export function Home() {
-  const { stateId, selectedCameras, mode, showMap, showList, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, toggleMap, toggleList, setDetailCam } = useTraffic();
+  const { stateId, cameras, selectedCameras, mode, showMap, showList, cardSize, density, sidebarOpen, toggleCamera, selectRoute, setSidebarOpen, toggleMap, toggleList, setDetailCam } = useTraffic();
 
   return (
     <div className={`page ${density === 'compact' ? 'density-compact' : ''}`}>
@@ -68,7 +86,7 @@ export function Home() {
             {showMap ? (
               <SplitView stateId={stateId} onBrowse={() => setSidebarOpen(true)} onCloseMap={showList ? toggleMap : undefined} onCloseList={showList ? toggleList : undefined} />
             ) : selectedCameras.length === 0 ? (
-              <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={() => setSidebarOpen(true)} showMap={showMap} />
+              <EmptyState stateId={stateId} cameras={cameras} selectRoute={selectRoute} toggleCamera={toggleCamera} onBrowse={() => setSidebarOpen(true)} showMap={showMap} />
             ) : (
                 <div className={`viewer-grid viewer-grid-${cardSize}`}>
                   {selectedCameras.map((cam) => (

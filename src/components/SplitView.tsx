@@ -45,7 +45,7 @@ interface SplitViewProps {
 }
 
 export function SplitView({ stateId, onBrowse, onCloseMap, onCloseList }: SplitViewProps) {
-  const { selectedCameras, showList, mode, cardSize, splitWidth, setSplitWidth, toggleCamera, selectRoute, setDetailCam } = useTraffic();
+  const { cameras, selectedCameras, showList, mode, cardSize, splitWidth, setSplitWidth, toggleCamera, selectRoute, setDetailCam } = useTraffic();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapPanelRef = useRef<HTMLDivElement>(null);
   const localPercent = useRef(splitWidth);
@@ -127,7 +127,7 @@ export function SplitView({ stateId, onBrowse, onCloseMap, onCloseList }: SplitV
           <div className="split-feeds-panel">
             {onCloseList && <CloseButton onClick={onCloseList} label="Hide List - Restore in View Options" />}
         {selectedCameras.length === 0 ? (
-          <EmptyState stateId={stateId} selectRoute={selectRoute} onBrowse={onBrowse} showMap />
+          <EmptyState stateId={stateId} cameras={cameras} selectRoute={selectRoute} toggleCamera={toggleCamera} onBrowse={onBrowse} showMap />
         ) : (
             <div className={`split-feeds-grid ${gridClass}`}>
               {selectedCameras.map((cam, index) => (
